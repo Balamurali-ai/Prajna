@@ -8,6 +8,7 @@ Loads from environment variables and .env file.
 """
 from __future__ import annotations
 
+import json
 from functools import lru_cache
 from typing import List, Literal
 
@@ -34,25 +35,53 @@ class Settings(BaseSettings):
     APP_PORT: int = 8000
     APP_LOG_LEVEL: str = "INFO"
     APP_TIMEZONE: str = "UTC"
-    ALLOWED_HOSTS: List[str] = ["*"]
+    ALLOWED_HOSTS: List[str] = Field(default=["*"])
 
     # ----- CORS -----
-    CORS_ORIGINS: List[str] = ["http://localhost:5173"]
+    CORS_ORIGINS: List[str] = Field(default=["http://localhost:5173"])
     CORS_ALLOW_CREDENTIALS: bool = True
 
     @field_validator("CORS_ORIGINS", mode="before")
     @classmethod
-    def _split_cors(cls, v):
-        if isinstance(v, str):
-            return [origin.strip() for origin in v.split(",") if origin.strip()]
-        return v
+    def parse_cors_origins(cls, value):
+        """
+        Accept both:
+        1. JSON array:
+           ["http://localhost:5173","https://frontend.onrender.com"]
+
+        2. Comma-separated string:
+           http://localhost:5173,https://frontend.onrender.com
+        """
+        if value is None:
+            return ["http://localhost:5173"]
+
+        if isinstance(value, list):
+            return value
+
+        if isinstance(value, str):
+            value = value.strip()
+
+            if not value:
+                return ["http://localhost:5173"]
+
+            # JSON array
+            if value.startswith("["):
+                try:
+                    return json.loads(value)
+                except json.JSONDecodeError:
+                    raise ValueError(
+                        "CORS_ORIGINS must be a valid JSON array."
+                    )
+
+            # Comma-separated string
+            return [origin.strip() for origin in value.split(",") if origin.strip()]
+
+        return ["http://localhost:5173"]
 
     # ----- Supabase -----
     SUPABASE_URL: str = ""
     SUPABASE_ANON_KEY: str = ""
     SUPABASE_SERVICE_ROLE_KEY: str = ""
-    # Dev-only fallback secret so /auth/login can mint a JWT in demos
-    # without a real Supabase project. Override in production.
     SUPABASE_JWT_SECRET: str = "dev-only-crime-intel-secret-do-not-use-in-prod"
 
     # ----- Database -----
@@ -78,9 +107,6 @@ class Settings(BaseSettings):
     RATE_LIMIT_PER_MINUTE: int = 100
 
     # ----- ML Artifacts -----
-    # Default points to backend/app/ml_artifacts/ — where the ML team
-    # drops their exported outputs. Override via env var
-    # ML_ARTIFACTS_PATH for non-standard layouts.
     ML_ARTIFACTS_PATH: str = "./app/ml_artifacts"
     ML_CACHE_REFRESH_SECONDS: int = 900
     ML_HOTSPOT_TOP_N: int = 20
