@@ -38,7 +38,7 @@ export default defineConfig({
         manualChunks: {
           react: ['react', 'react-dom', 'react-router-dom'],
           query: ['@tanstack/react-query'],
-          map: ['mapbox-gl', 'react-map-gl'],
+          map: ['leaflet', 'react-leaflet'],
           charts: ['recharts'],
           supabase: ['@supabase/supabase-js'],
           ui: ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu'],
