@@ -28,14 +28,15 @@ const queryClient = new QueryClient({
 export default function App() {
   const fetchMe = useAuthStore((s) => s.fetchMe)
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated)
+  const isGuest = useAuthStore((s) => s.isGuest)
   const token = useAuthStore((s) => s.token)
 
-  // Verify session on app load
+  // Verify session on app load — skip for guest sessions (no token, no backend call)
   useEffect(() => {
-    if (isAuthenticated && token) {
+    if (isAuthenticated && !isGuest && token) {
       fetchMe()
     }
-  }, [isAuthenticated, token, fetchMe])
+  }, [isAuthenticated, isGuest, token, fetchMe])
 
   return (
     <QueryClientProvider client={queryClient}>

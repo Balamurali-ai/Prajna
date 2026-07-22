@@ -9,9 +9,8 @@ from typing import List
 
 from fastapi import APIRouter, Depends, Path, Query, Request
 
-from app.middleware.auth import get_current_user
+from app.middleware.auth import get_read_only_user
 from app.schemas.risk import DistrictPrediction, RiskRanking, TopDistricts
-from app.schemas.user import UserResponse
 from app.services.risk_service import RiskService
 
 router = APIRouter(prefix="/risk", tags=["Risk Intelligence"])
@@ -28,7 +27,7 @@ def get_risk_service(request: Request) -> RiskService:
 )
 async def get_rankings(
     service: RiskService = Depends(get_risk_service),
-    current_user: UserResponse = Depends(get_current_user),
+    _=Depends(get_read_only_user),
 ) -> List[RiskRanking]:
     return await service.get_all_rankings()
 
@@ -40,7 +39,7 @@ async def get_rankings(
 )
 async def get_top10(
     service: RiskService = Depends(get_risk_service),
-    current_user: UserResponse = Depends(get_current_user),
+    _=Depends(get_read_only_user),
 ) -> TopDistricts:
     return await service.get_top_n(10)
 
@@ -53,7 +52,7 @@ async def get_top10(
 async def get_top(
     n: int = Query(10, ge=1, le=100, description="Number of districts to return"),
     service: RiskService = Depends(get_risk_service),
-    current_user: UserResponse = Depends(get_current_user),
+    _=Depends(get_read_only_user),
 ) -> TopDistricts:
     return await service.get_top_n(n)
 
@@ -66,6 +65,6 @@ async def get_top(
 async def get_district(
     district: str = Path(..., min_length=1, max_length=255),
     service: RiskService = Depends(get_risk_service),
-    current_user: UserResponse = Depends(get_current_user),
+    _=Depends(get_read_only_user),
 ) -> DistrictPrediction:
     return await service.get_district(district)

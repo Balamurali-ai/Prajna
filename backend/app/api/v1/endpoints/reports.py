@@ -13,7 +13,7 @@ from fastapi.responses import FileResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.middleware.auth import get_current_user
+from app.middleware.auth import get_current_user, get_read_only_user
 from app.repositories.report_repository import ReportRepository
 from app.schemas.report import ReportCreate, ReportResponse
 from app.schemas.user import UserResponse
@@ -34,13 +34,13 @@ def get_report_service(
     "/generate",
     response_model=ReportResponse,
     status_code=202,
-    summary="Generate a new report (async)",
+    summary="Generate a new report (async) — requires authentication",
 )
 async def generate_report(
     payload: ReportCreate,
     background_tasks: BackgroundTasks,
     service: ReportService = Depends(get_report_service),
-    current_user: UserResponse = Depends(get_current_user),
+    current_user=Depends(get_current_user),   # write — auth required
 ) -> ReportResponse:
     report = await service.create_report(payload, current_user.id)
     background_tasks.add_task(service.generate_report, report.id)
@@ -50,16 +50,16 @@ async def generate_report(
 @router.get(
     "",
     response_model=List[ReportResponse],
-    summary="List current user's reports",
+    summary="List reports",
 )
 async def list_reports(
     db: AsyncSession = Depends(get_db),
-    current_user: UserResponse = Depends(get_current_user),
+    _=Depends(get_read_only_user),
     skip: int = 0,
     limit: int = 50,
 ) -> List[ReportResponse]:
     repo = ReportRepository(db)
-    reports = await repo.list_by_user(current_user.id, skip=skip, limit=limit)
+    reports = await repo.list_all(skip=skip, limit=limit)
     return [ReportResponse.model_validate(r) for r in reports]
 
 
@@ -71,25 +71,23 @@ async def list_reports(
 async def get_report(
     report_id: UUID = Path(...),
     db: AsyncSession = Depends(get_db),
-    current_user: UserResponse = Depends(get_current_user),
+    _=Depends(get_read_only_user),
 ) -> ReportResponse:
     repo = ReportRepository(db)
     report = await repo.get_by_id(report_id)
     if not report:
         raise HTTPException(404, "Report not found")
-    if report.user_id != current_user.id and current_user.role.value != "admin":
-        raise HTTPException(403, "Not authorized to access this report")
     return ReportResponse.model_validate(report)
 
 
 @router.get(
     "/download/{report_id}",
-    summary="Download a generated report file",
+    summary="Download a generated report file — requires authentication",
 )
 async def download_report(
     report_id: UUID = Path(...),
     db: AsyncSession = Depends(get_db),
-    current_user: UserResponse = Depends(get_current_user),
+    current_user=Depends(get_current_user),   # download — auth required
 ):
     from app.core.exceptions import NotFoundException
 

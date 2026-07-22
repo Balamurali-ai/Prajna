@@ -8,12 +8,13 @@ import { toast } from 'sonner'
 
 import { Card, CardContent, CardHeader, Badge, Button, Input } from '@components/ui'
 import { adminApi } from '@api/index'
+import { useAuthStore } from '@store/index'
 import { formatDate, formatRelativeTime } from '@utils/index'
 import type { User, UserRole } from '@/types'
 
 const ROLES: UserRole[] = ['admin', 'officer', 'analyst']
 
-const roleBadge: Record<UserRole, string> = {
+const roleBadge: Record<string, string> = {
   admin: 'bg-red-500/20 text-red-400 border-red-500/30',
   officer: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
   analyst: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
@@ -21,6 +22,7 @@ const roleBadge: Record<UserRole, string> = {
 
 export function AdminUsersPage() {
   const qc = useQueryClient()
+  const isGuest = useAuthStore((s) => s.isGuest)
   const [search, setSearch] = useState('')
   const [editId, setEditId] = useState<string | null>(null)
   const [editRole, setEditRole] = useState<UserRole>('analyst')
@@ -122,7 +124,7 @@ export function AdminUsersPage() {
                           </div>
                         </td>
                         <td className="px-4 py-3">
-                          {editId === user.id ? (
+                          {!isGuest && editId === user.id ? (
                             <select
                               value={editRole}
                               onChange={(e) => setEditRole(e.target.value as UserRole)}
@@ -133,7 +135,7 @@ export function AdminUsersPage() {
                               ))}
                             </select>
                           ) : (
-                            <Badge className={roleBadge[user.role]}>
+                            <Badge className={roleBadge[user.role] ?? ''}>
                               {user.role}
                             </Badge>
                           )}
@@ -150,53 +152,57 @@ export function AdminUsersPage() {
                           {formatDate(user.created_at)}
                         </td>
                         <td className="px-4 py-3">
-                          <div className="flex items-center gap-1">
-                            {editId === user.id ? (
-                              <>
-                                <Button
-                                  size="icon"
-                                  variant="ghost"
-                                  className="h-7 w-7 text-emerald-400"
-                                  disabled={updateMutation.isPending}
-                                  onClick={() => updateMutation.mutate({ id: user.id, role: editRole })}
-                                >
-                                  {updateMutation.isPending ? (
-                                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                                  ) : (
-                                    <Check className="h-3.5 w-3.5" />
-                                  )}
-                                </Button>
-                                <Button
-                                  size="icon"
-                                  variant="ghost"
-                                  className="h-7 w-7 text-muted-foreground"
-                                  onClick={() => setEditId(null)}
-                                >
-                                  <X className="h-3.5 w-3.5" />
-                                </Button>
-                              </>
-                            ) : (
-                              <>
-                                <Button
-                                  size="icon"
-                                  variant="ghost"
-                                  className="h-7 w-7"
-                                  onClick={() => { setEditId(user.id); setEditRole(user.role) }}
-                                >
-                                  <Edit2 className="h-3.5 w-3.5" />
-                                </Button>
-                                <Button
-                                  size="icon"
-                                  variant="ghost"
-                                  className="h-7 w-7 text-red-400 hover:text-red-300"
-                                  disabled={deleteMutation.isPending}
-                                  onClick={() => deleteMutation.mutate(user.id)}
-                                >
-                                  <Trash2 className="h-3.5 w-3.5" />
-                                </Button>
-                              </>
-                            )}
-                          </div>
+                          {isGuest ? (
+                            <span className="text-xs text-muted-foreground">—</span>
+                          ) : (
+                            <div className="flex items-center gap-1">
+                              {editId === user.id ? (
+                                <>
+                                  <Button
+                                    size="icon"
+                                    variant="ghost"
+                                    className="h-7 w-7 text-emerald-400"
+                                    disabled={updateMutation.isPending}
+                                    onClick={() => updateMutation.mutate({ id: user.id, role: editRole })}
+                                  >
+                                    {updateMutation.isPending ? (
+                                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                    ) : (
+                                      <Check className="h-3.5 w-3.5" />
+                                    )}
+                                  </Button>
+                                  <Button
+                                    size="icon"
+                                    variant="ghost"
+                                    className="h-7 w-7 text-muted-foreground"
+                                    onClick={() => setEditId(null)}
+                                  >
+                                    <X className="h-3.5 w-3.5" />
+                                  </Button>
+                                </>
+                              ) : (
+                                <>
+                                  <Button
+                                    size="icon"
+                                    variant="ghost"
+                                    className="h-7 w-7"
+                                    onClick={() => { setEditId(user.id); setEditRole(user.role as UserRole) }}
+                                  >
+                                    <Edit2 className="h-3.5 w-3.5" />
+                                  </Button>
+                                  <Button
+                                    size="icon"
+                                    variant="ghost"
+                                    className="h-7 w-7 text-red-400 hover:text-red-300"
+                                    disabled={deleteMutation.isPending}
+                                    onClick={() => deleteMutation.mutate(user.id)}
+                                  >
+                                    <Trash2 className="h-3.5 w-3.5" />
+                                  </Button>
+                                </>
+                              )}
+                            </div>
+                          )}
                         </td>
                       </tr>
                     ))}

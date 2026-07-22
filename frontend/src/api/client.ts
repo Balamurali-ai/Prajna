@@ -26,6 +26,18 @@ function getToken(): string | null {
   }
 }
 
+// Check if the current session is a guest (no token, but isGuest flag set)
+function isGuestSession(): boolean {
+  try {
+    const raw = localStorage.getItem('crime-intel-auth')
+    if (!raw) return false
+    const state = JSON.parse(raw)?.state
+    return state?.isGuest === true
+  } catch {
+    return false
+  }
+}
+
 // ====================================================
 // Request Interceptor — Attach Auth Token
 // ====================================================
@@ -47,6 +59,13 @@ client.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
     if (error.response?.status === 401) {
+      // Never wipe the session or redirect if the user is in guest mode.
+      // Guests have no token so every authenticated endpoint returns 401 —
+      // that is expected and must not trigger a logout.
+      if (isGuestSession()) {
+        return Promise.reject(error)
+      }
+
       const url = error.config?.url ?? ''
       // Don't wipe session for background session-check calls
       if (!url.includes('/auth/me')) {

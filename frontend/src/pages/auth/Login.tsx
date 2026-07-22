@@ -5,7 +5,7 @@
  */
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Shield, Mail, Lock, Loader2, AlertCircle } from 'lucide-react'
+import { Shield, Mail, Lock, Loader2, AlertCircle, UserRound } from 'lucide-react'
 
 import { Button, Card, CardContent, Input } from '@components/ui'
 import { getSupabase } from '@services/supabase'
@@ -15,6 +15,7 @@ import { config } from '@config/index'
 export function LoginPage() {
   const navigate = useNavigate()
   const setSession = useAuthStore((s) => s.setSession)
+  const loginAsGuest = useAuthStore((s) => s.loginAsGuest)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -35,7 +36,6 @@ export function LoginPage() {
         })
         if (sbError) throw sbError
         if (data.session) {
-          // Only keep a Supabase session after the backend accepts that token.
           const { authApi } = await import('@api/index')
           const user = await authApi.me(data.session.access_token)
           setSession(data.session.access_token, user, data.session.expires_in ?? 3600)
@@ -43,7 +43,6 @@ export function LoginPage() {
           return
         }
       } catch (sbErr) {
-        // Supabase failed — fall back to backend login (dev mode)
         console.warn('Supabase login failed, using backend:', sbErr)
       }
 
@@ -57,6 +56,11 @@ export function LoginPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleGuestLogin = () => {
+    loginAsGuest()
+    navigate('/dashboard')
   }
 
   return (
@@ -126,11 +130,27 @@ export function LoginPage() {
                   'Sign in'
                 )}
               </Button>
-
-              <p className="text-center text-xs text-muted-foreground">
-                Secured by Supabase Auth • Prajna
-              </p>
             </form>
+
+            <div className="mt-3 flex items-center gap-3">
+              <div className="h-px flex-1 bg-border" />
+              <span className="text-xs text-muted-foreground">or</span>
+              <div className="h-px flex-1 bg-border" />
+            </div>
+
+            <Button
+              type="button"
+              variant="outline"
+              className="mt-3 w-full"
+              onClick={handleGuestLogin}
+            >
+              <UserRound className="h-4 w-4" />
+              Continue as Guest
+            </Button>
+
+            <p className="mt-4 text-center text-xs text-muted-foreground">
+              Secured by Supabase Auth • Prajna
+            </p>
           </CardContent>
         </Card>
       </div>

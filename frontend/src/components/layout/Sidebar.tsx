@@ -24,6 +24,7 @@ interface NavItem {
   label: string
   icon: React.ComponentType<{ className?: string }>
   roles?: string[]
+  hideForGuest?: boolean
 }
 
 const NAV_ITEMS: NavItem[] = [
@@ -34,16 +35,18 @@ const NAV_ITEMS: NavItem[] = [
   { to: '/explainability', label: 'Explainability', icon: Brain },
   { to: '/reports', label: 'Reports', icon: FileText },
   { to: '/admin/users', label: 'Users', icon: Users, roles: ['admin'] },
-  { to: '/settings', label: 'Settings', icon: Settings },
+  { to: '/settings', label: 'Settings', icon: Settings, hideForGuest: true },
 ]
 
 export function Sidebar() {
   const { sidebarOpen, toggleSidebar } = useUIStore()
-  const { user } = useAuthStore()
+  const { user, isGuest } = useAuthStore()
 
-  const filteredItems = NAV_ITEMS.filter(
-    (item) => !item.roles || (user && item.roles.includes(user.role))
-  )
+  const filteredItems = NAV_ITEMS.filter((item) => {
+    if (item.hideForGuest && isGuest) return false
+    if (item.roles && (!user || !item.roles.includes(user.role))) return false
+    return true
+  })
 
   return (
     <aside
@@ -110,8 +113,16 @@ export function Sidebar() {
       {/* Footer */}
       {sidebarOpen && (
         <div className="border-t border-border p-3 text-[10px] text-muted-foreground">
-          <p>ET AI Hackathon 2026</p>
-          <p className="mt-0.5">v1.0.0</p>
+          {isGuest ? (
+            <p className="rounded bg-amber-500/10 px-2 py-1 text-center text-amber-400">
+              👁 Read-only guest mode
+            </p>
+          ) : (
+            <>
+              <p>ET AI Hackathon 2026</p>
+              <p className="mt-0.5">v1.0.0</p>
+            </>
+          )}
         </div>
       )}
     </aside>

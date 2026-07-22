@@ -32,7 +32,7 @@ export type ApiResponse<T> = ApiSuccess<T> | ApiError
 // ============================
 // User & Auth
 // ============================
-export type UserRole = 'admin' | 'officer' | 'analyst'
+export type UserRole = 'admin' | 'officer' | 'analyst' | 'guest'
 
 export interface User {
   id: string

@@ -9,9 +9,8 @@ from typing import List, Optional
 
 from fastapi import APIRouter, Depends, Query, Request
 
-from app.middleware.auth import get_current_user
+from app.middleware.auth import get_read_only_user
 from app.schemas.hotspot import HotspotGeoJSON, HotspotRanking
-from app.schemas.user import UserResponse
 from app.services.hotspot_service import HotspotService
 
 router = APIRouter(prefix="/hotspots", tags=["Hotspots"])
@@ -28,7 +27,7 @@ def get_hotspot_service(request: Request) -> HotspotService:
 )
 async def get_hotspots(
     service: HotspotService = Depends(get_hotspot_service),
-    current_user: UserResponse = Depends(get_current_user),
+    _=Depends(get_read_only_user),
 ) -> List[HotspotRanking]:
     return await service.get_all()
 
@@ -41,7 +40,7 @@ async def get_hotspots(
 async def get_top_hotspots(
     n: Optional[int] = Query(None, ge=1, le=500, description="Limit (default from config)"),
     service: HotspotService = Depends(get_hotspot_service),
-    current_user: UserResponse = Depends(get_current_user),
+    _=Depends(get_read_only_user),
 ) -> List[HotspotRanking]:
     return await service.get_top(n)
 
@@ -54,6 +53,6 @@ async def get_top_hotspots(
 )
 async def get_geojson(
     service: HotspotService = Depends(get_hotspot_service),
-    current_user: UserResponse = Depends(get_current_user),
+    _=Depends(get_read_only_user),
 ) -> HotspotGeoJSON:
     return await service.get_geojson()

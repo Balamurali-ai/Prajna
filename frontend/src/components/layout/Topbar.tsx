@@ -12,7 +12,7 @@ import { useAuthStore } from '@store/index'
 
 export function Topbar() {
   const navigate = useNavigate()
-  const { user, logout } = useAuthStore()
+  const { user, logout, isGuest } = useAuthStore()
   const [search, setSearch] = useState('')
 
   const handleLogout = () => {
@@ -43,18 +43,28 @@ export function Topbar() {
 
       {/* Right */}
       <div className="flex items-center gap-3">
-        <Badge variant="success" className="gap-1.5">
-          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
-          Live
-        </Badge>
+        {isGuest ? (
+          <Badge variant="outline" className="gap-1.5 border-amber-500/40 text-amber-400">
+            👁 Read-only
+          </Badge>
+        ) : (
+          <Badge variant="success" className="gap-1.5">
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
+            Live
+          </Badge>
+        )}
 
-        <Button variant="ghost" size="icon">
-          <Bell className="h-4 w-4" />
-        </Button>
+        {!isGuest && (
+          <Button variant="ghost" size="icon">
+            <Bell className="h-4 w-4" />
+          </Button>
+        )}
 
         <div className="flex items-center gap-3 border-l border-border pl-3">
           <div className="text-right">
-            <p className="text-sm font-medium">{user?.full_name ?? user?.email ?? 'User'}</p>
+            <p className="text-sm font-medium">
+              {isGuest ? 'Guest' : (user?.full_name ?? user?.email ?? 'User')}
+            </p>
             <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
               {user?.role ?? 'guest'}
             </p>
@@ -62,7 +72,12 @@ export function Topbar() {
           <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-purple-600">
             <UserIcon className="h-4 w-4 text-white" />
           </div>
-          <Button variant="ghost" size="icon" onClick={handleLogout}>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleLogout}
+            title={isGuest ? 'Exit guest mode' : 'Sign out'}
+          >
             <LogOut className="h-4 w-4" />
           </Button>
         </div>

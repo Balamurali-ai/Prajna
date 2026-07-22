@@ -23,10 +23,12 @@ import { useAuthStore } from '@store/index'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const isAuth = useAuthStore((s) => s.isAuthenticated)
+  const isGuest = useAuthStore((s) => s.isGuest)
   const expiresAt = useAuthStore((s) => s.expiresAt)
   const logout = useAuthStore((s) => s.logout)
 
-  if (isAuth && expiresAt && Date.now() > expiresAt) {
+  // Only check token expiry for real (non-guest) sessions
+  if (!isGuest && isAuth && expiresAt && Date.now() > expiresAt) {
     logout()
     return <Navigate to="/login" replace />
   }

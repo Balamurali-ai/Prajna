@@ -8,6 +8,7 @@ import { useForm } from 'react-hook-form'
 import { Button, Card, CardContent, CardHeader, CardTitle, Input, Badge } from '@components/ui'
 import { useDeleteReport, useGenerateReport, useReports } from '@hooks/index'
 import { reportsApi } from '@api/index'
+import { useAuthStore } from '@store/index'
 import { formatDate, formatRelativeTime, downloadFromUrl } from '@utils/index'
 import type { Report, ReportFormat, ReportType } from '@/types'
 
@@ -52,6 +53,7 @@ export function ReportsPage() {
   const { data: reports, isLoading } = useReports()
   const generate = useGenerateReport()
   const del = useDeleteReport()
+  const isGuest = useAuthStore((s) => s.isGuest)
   const [showForm, setShowForm] = useState(false)
 
   const { register, handleSubmit, reset } = useForm<FormData>({
@@ -78,13 +80,15 @@ export function ReportsPage() {
             Generate, manage, and download intelligence reports
           </p>
         </div>
-        <Button onClick={() => setShowForm(!showForm)}>
-          <Plus className="h-4 w-4" />
-          New Report
-        </Button>
+        {!isGuest && (
+          <Button onClick={() => setShowForm(!showForm)}>
+            <Plus className="h-4 w-4" />
+            New Report
+          </Button>
+        )}
       </div>
 
-      {showForm && (
+      {!isGuest && showForm && (
         <Card>
           <CardHeader>
             <CardTitle>Generate New Report</CardTitle>
@@ -158,12 +162,14 @@ export function ReportsPage() {
           ) : reports && reports.length > 0 ? (
             <div className="divide-y divide-border/40">
               {reports.map((r) => (
-                <ReportRow key={r.id} report={r} onDelete={() => del.mutate(r.id)} />
+                <ReportRow key={r.id} report={r} onDelete={() => del.mutate(r.id)} isGuest={isGuest} />
               ))}
             </div>
           ) : (
             <p className="py-8 text-center text-sm text-muted-foreground">
-              No reports yet. Click "New Report" to generate one.
+              {isGuest
+                ? 'No reports available in guest mode.'
+                : 'No reports yet. Click "New Report" to generate one.'}
             </p>
           )}
         </CardContent>
@@ -172,7 +178,15 @@ export function ReportsPage() {
   )
 }
 
-function ReportRow({ report, onDelete }: { report: Report; onDelete: () => void }) {
+function ReportRow({
+  report,
+  onDelete,
+  isGuest,
+}: {
+  report: Report
+  onDelete: () => void
+  isGuest: boolean
+}) {
   const cfg = STATUS_CONFIG[report.status] ?? STATUS_CONFIG.pending
   const StatusIcon = cfg.icon
 
@@ -232,9 +246,11 @@ function ReportRow({ report, onDelete }: { report: Report; onDelete: () => void 
             <Download className="h-4 w-4" />
           </Button>
         )}
-        <Button variant="ghost" size="icon" onClick={onDelete}>
-          <Trash2 className="h-4 w-4" />
-        </Button>
+        {!isGuest && (
+          <Button variant="ghost" size="icon" onClick={onDelete}>
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        )}
       </div>
     </div>
   )

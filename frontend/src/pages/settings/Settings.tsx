@@ -13,18 +13,18 @@ import { config } from '@config/index'
 import { post } from '@api/client'
 
 export function SettingsPage() {
-  const { user, setUser } = useAuthStore()
+  const { user, setUser, isGuest } = useAuthStore()
   const [name, setName] = useState(user?.full_name ?? '')
   const [saving, setSaving] = useState(false)
 
   const handleSave = async () => {
+    if (isGuest) return
     setSaving(true)
     try {
       const updated = await post<typeof user>('/auth/me/profile', { full_name: name })
       if (updated && user) setUser({ ...user, full_name: name })
       toast.success('Profile updated')
     } catch {
-      // Optimistic update even if backend doesn't have this endpoint yet
       if (user) setUser({ ...user, full_name: name })
       toast.success('Profile updated locally')
     } finally {
@@ -39,6 +39,12 @@ export function SettingsPage() {
         <p className="text-sm text-muted-foreground">Account & preferences</p>
       </div>
 
+      {isGuest && (
+        <div className="rounded-md border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-400">
+          👁 You are browsing in guest mode. Profile changes are disabled.
+        </div>
+      )}
+
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader>
@@ -49,7 +55,11 @@ export function SettingsPage() {
               <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                 Full Name
               </label>
-              <Input value={name} onChange={(e) => setName(e.target.value)} />
+              <Input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                disabled={isGuest}
+              />
             </div>
             <div className="space-y-1.5">
               <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
@@ -71,7 +81,7 @@ export function SettingsPage() {
                 <Input value={user.department} disabled />
               </div>
             )}
-            <Button onClick={handleSave} disabled={saving}>
+            <Button onClick={handleSave} disabled={saving || isGuest}>
               {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Check className="mr-2 h-4 w-4" />}
               Save Changes
             </Button>

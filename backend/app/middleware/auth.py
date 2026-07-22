@@ -9,6 +9,7 @@ and role-based access control.
 from __future__ import annotations
 
 import os
+from datetime import datetime, timezone
 from typing import Optional
 from uuid import UUID, uuid4
 
@@ -24,7 +25,7 @@ from app.core.exceptions import (
 )
 from app.core.security import Role, decode_token, has_role, require_role, validate_supabase_token
 from app.database import get_db
-from app.database.models.user import User, UserRole
+from app.database.models.user import User, UserRole, UserStatus
 from app.repositories.user_repository import UserRepository
 from app.schemas.user import TokenPayload
 
@@ -53,9 +54,6 @@ async def get_token(
         and x_demo_bypass == "1"
         and settings.APP_ENV != "production"
     ):
-        # Stash email on request.state for the next dependency
-        # (FastAPI lets us do this via a sentinel; we read it in
-        # get_current_user_payload via the same request).
         return "dev-bypass-token"
     raise AuthenticationException("Missing authentication token")
 
@@ -73,7 +71,6 @@ async def get_current_user_payload(
         token == "dev-bypass-token"
         and settings.APP_ENV != "production"
     ):
-        # Honour X-Demo-Email so the bypass user is a real Pydantic email
         email = request.headers.get("X-Demo-Email") or "demo@example.com"
         payload = {
             "sub": str(uuid4()),
@@ -110,8 +107,6 @@ async def get_current_user(
         getattr(request.state, "token_payload", {}).get("email", "").endswith("@example.com")
         and settings.APP_ENV != "production"
     ):
-        from datetime import datetime as _dt, timezone as _tz
-        from app.database.models.user import UserStatus
         user = User(
             id=uuid4(),
             supabase_user_id=UUID(str(request.state.user_id)),
@@ -119,10 +114,9 @@ async def get_current_user(
             full_name="Demo Admin",
             role=UserRole.ADMIN,
             status=UserStatus.ACTIVE,
-            created_at=_dt.now(_tz.utc),
-            updated_at=_dt.now(_tz.utc),
+            created_at=datetime.now(timezone.utc),
+            updated_at=datetime.now(timezone.utc),
         )
-        # Avoid DB lookups for this synthetic user
         request.state.db_user = user
         return user
 
@@ -166,6 +160,44 @@ async def get_current_user(
 
     request.state.db_user = user
     return user
+
+
+# ====================================================
+# Read-Only Access — Authenticated OR Guest
+# ====================================================
+async def get_read_only_user(
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security),
+):
+    """Allow access for both authenticated users and unauthenticated guests.
+
+    - Token present and valid  → validate and return the real DB user.
+    - No token (guest mode)    → return a synthetic read-only user, no DB hit.
+
+    Used exclusively on GET (read-only) endpoints.
+    POST / PATCH / DELETE endpoints must keep using get_current_user.
+    """
+    if credentials and credentials.credentials:
+        # Authenticated path — reuse the full auth stack
+        payload = await get_current_user_payload(
+            request=request,
+            token=credentials.credentials,
+        )
+        return await get_current_user(request=request, payload=payload, db=db)
+
+    # Unauthenticated / guest path — synthetic read-only user, no DB hit
+    guest = User(
+        id=uuid4(),
+        supabase_user_id=uuid4(),
+        email="guest@prajna.local",
+        full_name="Guest",
+        role=UserRole.ANALYST,   # lowest privilege — sufficient for all reads
+        status=UserStatus.ACTIVE,
+        created_at=datetime.now(timezone.utc),
+        updated_at=datetime.now(timezone.utc),
+    )
+    return guest
 
 
 # ====================================================

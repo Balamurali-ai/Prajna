@@ -11,9 +11,8 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends, Request
 
 from app.core.config import settings
-from app.middleware.auth import get_current_user
+from app.middleware.auth import get_read_only_user
 from app.schemas.dashboard import DashboardResponse
-from app.schemas.user import UserResponse
 from app.services.dashboard_service import DashboardService
 
 router = APIRouter(prefix="/dashboard", tags=["Dashboard"])
@@ -34,7 +33,7 @@ def get_dashboard_service(request: Request) -> DashboardService:
 )
 async def get_dashboard(
     service: DashboardService = Depends(get_dashboard_service),
-    current_user: UserResponse = Depends(get_current_user),
+    _=Depends(get_read_only_user),
 ) -> DashboardResponse:
     return await service.get_full_dashboard()
 
@@ -45,6 +44,6 @@ async def get_dashboard(
 )
 async def get_metrics(
     service: DashboardService = Depends(get_dashboard_service),
-    current_user: UserResponse = Depends(get_current_user),
+    _=Depends(get_read_only_user),
 ):
     return (await service.get_full_dashboard()).metrics

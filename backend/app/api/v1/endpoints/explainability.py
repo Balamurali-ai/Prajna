@@ -7,9 +7,8 @@ from __future__ import annotations
 
 from fastapi import APIRouter, Depends, Path, Request
 
-from app.middleware.auth import get_current_user
+from app.middleware.auth import get_read_only_user
 from app.schemas.explainability import DistrictExplanation, GlobalExplanation
-from app.schemas.user import UserResponse
 from app.services.explainability_service import ExplainabilityService
 
 router = APIRouter(prefix="/explainability", tags=["Explainability"])
@@ -26,7 +25,7 @@ def get_explainability_service(request: Request) -> ExplainabilityService:
 )
 async def get_global(
     service: ExplainabilityService = Depends(get_explainability_service),
-    current_user: UserResponse = Depends(get_current_user),
+    _=Depends(get_read_only_user),
 ) -> GlobalExplanation:
     return await service.get_global()
 
@@ -39,6 +38,6 @@ async def get_global(
 async def get_district_explanation(
     district: str = Path(..., min_length=1, max_length=255),
     service: ExplainabilityService = Depends(get_explainability_service),
-    current_user: UserResponse = Depends(get_current_user),
+    _=Depends(get_read_only_user),
 ) -> DistrictExplanation:
     return await service.get_district_explanation(district)
