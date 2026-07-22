@@ -112,7 +112,7 @@ export function RiskRankingTable({
     },
     {
       id: 'actions',
-      cell: ({ row }) => (
+      cell: () => (
         <ChevronRight className="h-4 w-4 text-muted-foreground" />
       ),
       enableSorting: false,

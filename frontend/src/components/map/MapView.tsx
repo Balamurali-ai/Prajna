@@ -16,7 +16,6 @@ import { getRiskColor, getRiskLevel } from '@utils/index'
 
 
 interface MapViewProps {
-  onDistrictClick?: (district: string) => void
   showHotspots?: boolean
   showRiskChoropleth?: boolean
   height?: string
@@ -191,9 +190,7 @@ export function MapView({
   // Add risk marker overlay
   useEffect(() => {
     if (!mapReady || !map.current || !riskData) return
-    const m = map.current
-    // Markers are simple — district centroids not provided in predictions CSV,
-    // so we leave this as a future enhancement when district boundaries are available.
+    // District centroids not provided — future enhancement
   }, [mapReady, riskData])
 
   return (

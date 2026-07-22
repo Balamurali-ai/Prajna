@@ -2,11 +2,11 @@
  * Admin Users Page — real backend wired
  */
 import { useState } from 'react'
-import { Shield, Trash2, Edit2, Check, X, Loader2, UserPlus } from 'lucide-react'
+import { Shield, Trash2, Edit2, Check, X, Loader2 } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { Card, CardContent, CardHeader, CardTitle, Badge, Button, Input } from '@components/ui'
+import { Card, CardContent, CardHeader, Badge, Button, Input } from '@components/ui'
 import { adminApi } from '@api/index'
 import { formatDate, formatRelativeTime } from '@utils/index'
 import type { User, UserRole } from '@/types'

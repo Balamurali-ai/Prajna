@@ -1,7 +1,5 @@
 /**
- * ====================================================
  * Reports Page
- * ====================================================
  */
 import { useState } from 'react'
 import { Download, FileText, Plus, Trash2, Loader2, CheckCircle2, XCircle, Clock } from 'lucide-react'
@@ -28,7 +26,14 @@ const REPORT_FORMATS: { value: ReportFormat; label: string }[] = [
   { value: 'json', label: 'JSON' },
 ]
 
-const STATUS_CONFIG = {
+interface StatusConfig {
+  icon: React.ComponentType<{ className?: string }>
+  color: string
+  label: string
+  spin?: boolean
+}
+
+const STATUS_CONFIG: Record<string, StatusConfig> = {
   pending: { icon: Clock, color: 'text-yellow-400', label: 'Pending' },
   processing: { icon: Loader2, color: 'text-blue-400', label: 'Processing', spin: true },
   completed: { icon: CheckCircle2, color: 'text-emerald-400', label: 'Completed' },
@@ -36,18 +41,20 @@ const STATUS_CONFIG = {
   expired: { icon: Clock, color: 'text-slate-400', label: 'Expired' },
 }
 
+type FormData = {
+  title: string
+  description?: string
+  report_type: ReportType
+  format: ReportFormat
+}
+
 export function ReportsPage() {
   const { data: reports, isLoading } = useReports()
   const generate = useGenerateReport()
   const del = useDeleteReport()
-
   const [showForm, setShowForm] = useState(false)
-  const { register, handleSubmit, reset, watch } = useForm<{
-    title: string
-    description?: string
-    report_type: ReportType
-    format: ReportFormat
-  }>({
+
+  const { register, handleSubmit, reset } = useForm<FormData>({
     defaultValues: {
       title: '',
       description: '',
@@ -56,7 +63,7 @@ export function ReportsPage() {
     },
   })
 
-  const onGenerate = async (data: { title: string; description?: string; report_type: ReportType; format: ReportFormat }) => {
+  const onGenerate = async (data: FormData) => {
     await generate.mutateAsync(data)
     setShowForm(false)
     reset()
@@ -77,7 +84,6 @@ export function ReportsPage() {
         </Button>
       </div>
 
-      {/* Generate form */}
       {showForm && (
         <Card>
           <CardHeader>
@@ -142,7 +148,6 @@ export function ReportsPage() {
         </Card>
       )}
 
-      {/* Reports list */}
       <Card>
         <CardHeader>
           <CardTitle>My Reports ({reports?.length ?? 0})</CardTitle>
@@ -153,11 +158,7 @@ export function ReportsPage() {
           ) : reports && reports.length > 0 ? (
             <div className="divide-y divide-border/40">
               {reports.map((r) => (
-                <ReportRow
-                  key={r.id}
-                  report={r}
-                  onDelete={() => del.mutate(r.id)}
-                />
+                <ReportRow key={r.id} report={r} onDelete={() => del.mutate(r.id)} />
               ))}
             </div>
           ) : (
@@ -172,7 +173,7 @@ export function ReportsPage() {
 }
 
 function ReportRow({ report, onDelete }: { report: Report; onDelete: () => void }) {
-  const cfg = STATUS_CONFIG[report.status]
+  const cfg = STATUS_CONFIG[report.status] ?? STATUS_CONFIG.pending
   const StatusIcon = cfg.icon
 
   const handleDownload = () => {
@@ -192,9 +193,6 @@ function ReportRow({ report, onDelete }: { report: Report; onDelete: () => void 
         window.URL.revokeObjectURL(url)
       })
   }
-
-  // Suppress unused
-  void watch
 
   return (
     <div className="flex items-center justify-between p-4 transition-colors hover:bg-muted/30">
@@ -226,7 +224,7 @@ function ReportRow({ report, onDelete }: { report: Report; onDelete: () => void 
       </div>
       <div className="flex items-center gap-2">
         <Badge variant="outline" className="gap-1.5">
-          <StatusIcon className={`h-3 w-3 ${cfg.color} ${cfg.spin ? 'animate-spin' : ''}`} />
+          <StatusIcon className={`h-3 w-3 ${cfg.color}${cfg.spin ? ' animate-spin' : ''}`} />
           {cfg.label}
         </Badge>
         {report.status === 'completed' && (
