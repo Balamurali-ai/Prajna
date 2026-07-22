@@ -68,7 +68,11 @@ def _create_engine() -> AsyncEngine:
         pool_timeout=settings.DATABASE_POOL_TIMEOUT,
         pool_pre_ping=True,
         pool_recycle=3600,
-        connect_args={"prepared_statement_cache_size": 0, "timeout": 10},
+        connect_args={
+            "prepared_statement_cache_size": 0,
+            "statement_cache_size": 0,
+            "timeout": 10,
+        },
     )
 
 
@@ -98,13 +102,22 @@ def _get_engine() -> AsyncEngine:
 
 
 async def init_db() -> bool:
-    """Initialize database connection. Non-fatal in development."""
+    """Initialize database connection and create tables if missing."""
     try:
         _log_database_target()
         db_engine = _get_engine()
         async with db_engine.begin() as conn:
             await conn.execute(text("SELECT 1"))
         logger.info("Database connection established")
+
+        # Auto-create all tables (safe — skips existing)
+        try:
+            async with db_engine.begin() as conn:
+                await conn.run_sync(Base.metadata.create_all)
+            logger.info("Database tables verified/created")
+        except Exception as e:
+            logger.warning(f"Table creation skipped: {e}")
+
         return True
     except Exception as exc:
         logger.warning(f"Database connection failed: {exc}")

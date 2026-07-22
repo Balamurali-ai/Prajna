@@ -8,7 +8,6 @@ Records every API call to the audit log.
 from __future__ import annotations
 
 import time
-from typing import Optional
 
 from fastapi import Request
 from loguru import logger
@@ -45,14 +44,14 @@ class AuditLogMiddleware(BaseHTTPMiddleware):
     ) -> None:
         """Write an audit log entry."""
         from app.database.session import AsyncSessionLocal
+        if AsyncSessionLocal is None:
+            return
 
-        # Determine action based on method
         action = self._action_for(request, response)
 
-        # Extract user info if available
-        user_id: Optional[str] = None
-        user_email: Optional[str] = None
-        user_role: Optional[str] = None
+        user_id = None
+        user_email = None
+        user_role = None
         token_payload = getattr(request.state, "token_payload", None)
         if token_payload:
             user_id = token_payload.get("sub")
@@ -78,7 +77,10 @@ class AuditLogMiddleware(BaseHTTPMiddleware):
                 duration_ms=int(duration_ms),
             )
             session.add(entry)
-            await session.commit()
+            try:
+                await session.commit()
+            except Exception:
+                await session.rollback()
 
     def _action_for(self, request: Request, response: Response) -> AuditAction:
         method = request.method
