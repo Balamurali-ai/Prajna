@@ -63,12 +63,11 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     logger.info(f"📍 Environment: {settings.APP_ENV}")
 
     # Initialize database
-    await init_db()
-    logger.info("✅ Database initialized")
+    if await init_db():
+        logger.info("Database initialized")
 
-    # Initialize cache
+    # Initialize optional cache
     await init_cache()
-    logger.info("✅ Cache initialized")
 
     # Load ML artifacts (read-only)
     try:

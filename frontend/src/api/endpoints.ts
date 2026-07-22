@@ -7,6 +7,7 @@
  * ====================================================
  */
 import { del, get, patch, post } from './client'
+import { config } from '@config/index'
 import type {
   AnalyticsReport,
   CategoryDistribution,
@@ -91,7 +92,7 @@ export const reportsApi = {
     filters?: Record<string, unknown>
   }) => post<Report>('/reports/generate', payload),
   downloadUrl: (id: string) =>
-    `${import.meta.env.VITE_API_BASE_URL?.replace('/api/v1', '')}/api/v1/reports/download/${id}`,
+    `${config.api.baseUrl}/reports/download/${id}`,
   delete: (id: string) => del<void>(`/reports/${id}`),
 }
 

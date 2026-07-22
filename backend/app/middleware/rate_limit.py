@@ -42,6 +42,9 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         # Check rate limit
         try:
             redis = get_redis()
+            if redis is None:
+                return await call_next(request)
+
             window = 60  # seconds
             limit = settings.RATE_LIMIT_PER_MINUTE
             key = f"ratelimit:{identifier}:{int(time.time() // window)}"

@@ -10,17 +10,22 @@ from __future__ import annotations
 
 import json
 from functools import lru_cache
+from pathlib import Path
 from typing import List, Literal
 
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
+BACKEND_DIR = Path(__file__).resolve().parents[2]
+BACKEND_ENV_FILE = BACKEND_DIR / ".env"
+
+
 class Settings(BaseSettings):
     """Application settings."""
 
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=BACKEND_ENV_FILE,
         env_file_encoding="utf-8",
         case_sensitive=True,
         extra="ignore",
@@ -85,14 +90,14 @@ class Settings(BaseSettings):
     SUPABASE_JWT_SECRET: str = "dev-only-crime-intel-secret-do-not-use-in-prod"
 
     # ----- Database -----
-    DATABASE_URL: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/crime_intel"
+    DATABASE_URL: str = ""
     DATABASE_POOL_SIZE: int = 10
     DATABASE_MAX_OVERFLOW: int = 20
     DATABASE_POOL_TIMEOUT: int = 30
     DATABASE_ECHO: bool = False
 
     # ----- Redis -----
-    REDIS_URL: str = "redis://localhost:6379/0"
+    REDIS_URL: str = ""
     REDIS_PASSWORD: str = ""
     REDIS_MAX_CONNECTIONS: int = 50
     CACHE_TTL_SECONDS: int = 300

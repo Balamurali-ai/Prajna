@@ -9,6 +9,19 @@
 
 const env = import.meta.env
 
+const trimTrailingSlash = (value: string | undefined): string =>
+  (value ?? '').replace(/\/+$/, '')
+
+const apiBaseUrl = (() => {
+  const baseUrl = trimTrailingSlash(env.VITE_API_BASE_URL)
+  if (!baseUrl) return ''
+  return baseUrl.endsWith('/api/v1') ? baseUrl : `${baseUrl}/api/v1`
+})()
+
+const wsBaseUrl = trimTrailingSlash(env.VITE_WS_BASE_URL)
+  .replace(/^http:\/\//, 'ws://')
+  .replace(/^https:\/\//, 'wss://')
+
 export const config = {
   app: {
     name: env.VITE_APP_NAME ?? 'Crime Intelligence Platform',
@@ -16,8 +29,8 @@ export const config = {
     env: env.VITE_APP_ENV ?? 'development',
   },
   api: {
-    baseUrl: env.VITE_API_BASE_URL ?? 'http://localhost:8000/api/v1',
-    wsUrl: env.VITE_WS_BASE_URL ?? 'ws://localhost:8000',
+    baseUrl: apiBaseUrl,
+    wsUrl: wsBaseUrl,
     timeout: 30_000,
   },
   supabase: {
