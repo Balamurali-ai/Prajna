@@ -23,7 +23,6 @@ interface MapViewProps {
 }
 
 export function MapView({
-  onDistrictClick,
   showHotspots = true,
   showRiskChoropleth = true,
   height = '100%',
