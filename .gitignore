@@ -1,0 +1,73 @@
+# --- Backend ---
+backend/.venv/
+backend/__pycache__/
+backend/**/__pycache__/
+backend/.pytest_cache/
+backend/.mypy_cache/
+backend/.ruff_cache/
+backend/htmlcov/
+backend/.coverage
+backend/coverage.xml
+backend/dist/
+backend/build/
+backend/*.egg-info/
+
+# --- Frontend ---
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/.next/
+frontend/.cache/
+frontend/.parcel-cache/
+frontend/.turbo/
+frontend/coverage/
+
+# --- Env / Secrets ---
+.env
+.env.local
+.env.*.local
+**/.env
+!**/.env.example
+backend/.env
+frontend/.env
+
+# --- IDE ---
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# --- Logs ---
+*.log
+logs/
+*.log.*
+
+# --- ML artifacts (large) ---
+backend/app/ml_artifacts/**/*.parquet
+backend/app/ml_artifacts/**/*.geojson
+backend/app/ml_artifacts/**/*.csv
+ml/outputs/**/*.parquet
+ml/outputs/**/*.geojson
+ml/outputs/**/*.pkl
+ml/outputs/**/*.csv
+ml/outputs/figures/
+
+# --- Python caches ---
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# --- OS ---
+desktop.ini
+$RECYCLE.BIN/
+
+# --- Temp ---
+tmp/
+.tmp/
+*.tmp
+*.bak
+*.orig
+node_modules

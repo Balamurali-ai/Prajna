@@ -1,0 +1,28 @@
+{
+  "name": "crime-intelligence-platform",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Geospatial Crime Pattern Intelligence - ET AI Hackathon 2026",
+  "workspaces": [
+    "frontend"
+  ],
+  "scripts": {
+    "dev": "concurrently -n backend,frontend -c green,blue \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd backend && uvicorn app.main:app --reload --port 8000",
+    "dev:frontend": "cd frontend && pnpm dev",
+    "build": "cd frontend && pnpm build",
+    "lint": "cd frontend && pnpm lint && cd ../backend && ruff check .",
+    "format": "cd frontend && pnpm format && cd ../backend && black . && ruff check --fix .",
+    "test": "cd backend && pytest && cd ../frontend && pnpm test",
+    "docker:build": "docker-compose -f deployment/docker/docker-compose.yml build",
+    "docker:up": "docker-compose -f deployment/docker/docker-compose.yml up -d",
+    "docker:down": "docker-compose -f deployment/docker/docker-compose.yml down"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.0"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  }
+}

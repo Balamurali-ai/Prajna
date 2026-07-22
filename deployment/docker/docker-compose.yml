@@ -1,0 +1,76 @@
+# ====================================================
+# Docker Compose (Production)
+# ====================================================
+# For local dev / single-host production
+# ====================================================
+version: '3.9'
+
+services:
+  # ---------------- Backend ----------------
+  backend:
+    build:
+      context: ../../backend
+      dockerfile: Dockerfile
+    container_name: crime-intel-backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    env_file:
+      - ../../backend/.env
+    environment:
+      - APP_ENV=production
+      - APP_DEBUG=false
+    depends_on:
+      - redis
+    volumes:
+      - backend_storage:/app/storage
+    networks:
+      - crime-intel
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ---------------- Frontend ----------------
+  frontend:
+    build:
+      context: ../../frontend
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_BASE_URL=${VITE_API_BASE_URL:-http://localhost:8000/api/v1}
+        - VITE_SUPABASE_URL=${VITE_SUPABASE_URL}
+        - VITE_SUPABASE_ANON_KEY=${VITE_SUPABASE_ANON_KEY}
+        - VITE_MAPBOX_PUBLIC_TOKEN=${VITE_MAPBOX_PUBLIC_TOKEN}
+    container_name: crime-intel-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - crime-intel
+
+  # ---------------- Redis ----------------
+  redis:
+    image: redis:7-alpine
+    container_name: crime-intel-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
+    networks:
+      - crime-intel
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  redis_data:
+  backend_storage:
+
+networks:
+  crime-intel:
+    driver: bridge

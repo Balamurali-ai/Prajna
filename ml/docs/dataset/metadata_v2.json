@@ -1,0 +1,57 @@
+{
+  "project": "EdgeGuard Geospatial Crime Pattern Intelligence - ET AI Hackathon 2026 (Version 2)",
+  "generated_at_utc": "2026-07-17T01:18:54.845698+00:00",
+  "row_count": 52856,
+  "column_count": 56,
+  "years_covered": [
+    2021,
+    2022,
+    2023,
+    2024,
+    2025,
+    2026
+  ],
+  "geometry_source": {
+    "name": "geohacker/india (GADM v1-derived district boundaries)",
+    "url": "https://raw.githubusercontent.com/geohacker/india/master/district/india_district.geojson",
+    "vintage": "~2009 (pre-Telangana bifurcation 2014, pre-Ladakh creation 2019, pre-Odisha/Uttarakhand renames 2011/2007 applied as name-only crosswalk)",
+    "license_note": "GADM data is free for academic/non-commercial use; GADM requests citation and does not permit redistribution for commercial purposes without permission - flagged here for any team productionizing this beyond the hackathon."
+  },
+  "allocation_model_note": "This replaces Version 1's pure population-weighted split. All five inputs are documented above; none are randomly drawn. CapitalCityEffect and commercial_activity are explicitly SYNTHETIC assumptions (see DELHI_DISTRICT_PROFILE_NOTE); population and density are Official/Derived from Census 2011 (see official_reference.py).",
+  "digital_adoption_note": "Qualitative consensus across secondary aggregators (Statista, DataReportal Digital 2025 India report, muftinternet.com internet-usage summary), cross-referenced 2026-07-16. NOT an official TRAI state-wise table - TRAI's own quarterly PDF only publishes circle-level (multi-state) tele-density, which does not cleanly decompose to individual states. This ranking is used ONLY as a capped +/-15% multiplier in the district-allocation model below, never presented as a statistic in its own right.",
+  "coordinate_type_meaning": {
+    "Polygon": "Rejection-sampled inside a real GADM-derived district-union state/UT polygon.",
+    "Polygon_Approximate": "Same as Polygon, but the underlying GADM geometry is a pre-split undivided parent (Andhra Pradesh standing in for Telangana; Jammu and Kashmir standing in for Ladakh).",
+    "Polygon_Clipped_Estimate": "Delhi district-level only: a hand-drawn cardinal-direction rectangle intersected with the REAL Delhi outer boundary. Real outer shape, approximate internal district split."
+  },
+  "whats_new_vs_v1": [
+    "Real polygon-based coordinate sampling (rejection sampling) replaces V1's bounding boxes.",
+    "Explainable multi-factor Delhi district allocation model (population + density + commercial activity + capital-city effect) replaces V1's population-only split.",
+    "Delhi districts now have documented, differentiated crime-category boosts and office-hour bias.",
+    "Real adjacency graph (from polygon topology) replaces V1's same-state-only neighbor averaging.",
+    "Added: Quarter, Week, Is_Weekend, Is_Office_Hour, Is_Night, Is_Festival_Month, Spatial_Lag, Local_Moran_I_Proxy, Cluster_ID, Distance_to_District_HQ_km, Distance_to_Nearest_Police_Station_km, Urban_Density_Proxy, Commercial_Density_Proxy, Digital_Adoption_Tier, Risk_Percentile, Risk_Rank, Trend_Score, Anomaly_Score, Historical_Growth, Expected_Growth."
+  ],
+  "known_gaps": [
+    "District-level cybercrime case counts for any state/UT (NCRB does not publish these publicly; only state/UT-level totals exist in the sources found).",
+    "Official district boundary polygon files (GADM / Survey of India) - this sandbox's network egress is restricted to package registries (PyPI/npm/GitHub) and cannot reach gadm.org, censusindia.gov.in GIS services, or data.gov.in shapefile downloads. All coordinates in this dataset are therefore generated inside approximate bounding boxes, never real polygons, and are labelled Coordinate_Type = 'Estimated' throughout.",
+    "Census 2021 was not conducted (delayed nationally); all population figures here are Census 2011, aged 15 years, and are explicitly labelled as such.",
+    "Full district-wise population for all ~766 Indian districts (only Delhi's was researched in depth per the brief's 'special priority on Delhi' instruction; other states use state-level totals only, split synthetically).",
+    "RBI counterfeit currency detection statistics - not researched in this pass; Crime_Category 'Counterfeit Currency' in the synthetic dataset uses an assumed low relative frequency, NOT an RBI-sourced figure. This is flagged in feature_dictionary.csv as Synthetic, not Official.",
+    "District-level literacy, internet penetration, bank branch density, and other socioeconomic covariates requested in the brief - not sourced in this pass. Present as None/omitted rather than fabricated.",
+    "No official state-wise TRAI internet-penetration or NPCI UPI-adoption table with clean per-state figures was found reachable in this environment; used only as a qualitative, capped multiplier (see QUALITATIVE_DIGITAL_ADOPTION_TIER).",
+    "Real district-level polygons exist in this pipeline ONLY for Delhi's cardinal sub-regions (clipped to the real Delhi outer boundary) and for the other ~594 pre-2014 GADM districts used to build STATE-level polygons. We do NOT have real sub-state district polygons for any state other than via this coarse GADM snapshot, and Telangana/Ladakh reuse their pre-split parent's undivided polygon (flagged Coordinate_Type='Polygon_Approximate').",
+    "Bank branch density, road density, and police-station-count datasets were not found/fetched in this pass; corresponding features are omitted or use explicitly-labelled synthetic placeholders, never fabricated official figures."
+  ],
+  "reproducibility": {
+    "random_seed": 42,
+    "scripts": [
+      "build_geometry.py",
+      "generate_dataset_v2.py",
+      "feature_engineering_v2.py",
+      "validate_v2.py",
+      "save_outputs_v2.py",
+      "visualize_v2.py"
+    ]
+  },
+  "sampling_note": "Same capped weighted-sample design as V1 (max 400 rows/unit-year, Sample_Weight reconstructs official totals exactly)."
+}

@@ -1,0 +1,36 @@
+name: Docker Build
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+
+jobs:
+  backend:
+    name: Backend Image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build & push
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/crime-intel-backend:latest
+            ghcr.io/${{ github.repository_owner }}/crime-intel-backend:${{ github.sha }}
+
+  frontend:
+    name: Frontend Image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build & push
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/crime-intel-frontend:latest
+            ghcr.io/${{ github.repository_owner }}/crime-intel-frontend:${{ github.sha }}

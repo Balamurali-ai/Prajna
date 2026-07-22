@@ -1,0 +1,21 @@
+provider = "postgresql"
+region   = "us-east-1"
+
+[[services]]
+  name             = "crime-intel-backend"
+  plan             = "starter"
+  build_command    = ""
+  start_command    = "uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 4"
+  healthcheck_path = "/health"
+
+  [services.env]
+    APP_ENV                = "production"
+    APP_DEBUG              = "false"
+    SUPABASE_URL           = "${{ secrets.SUPABASE_URL }}"
+    SUPABASE_ANON_KEY      = "${{ secrets.SUPABASE_ANON_KEY }}"
+    SUPABASE_SERVICE_ROLE_KEY = "${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}"
+    SUPABASE_JWT_SECRET    = "${{ secrets.SUPABASE_JWT_SECRET }}"
+    DATABASE_URL           = "${{ secrets.DATABASE_URL }}"
+    REDIS_URL              = "${{ secrets.REDIS_URL }}"
+    MAPBOX_PUBLIC_TOKEN    = "${{ secrets.MAPBOX_PUBLIC_TOKEN }}"
+    ML_ARTIFACTS_PATH      = "/app/ml_artifacts"

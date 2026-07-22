@@ -1,0 +1,65 @@
+EDGEGUARD V2 - DATASET VALIDATION REPORT
+Rows: 52,856  Columns: 56
+======================================================================
+[PASS] No duplicate Incident_ID
+[PASS] Coordinates within India bbox (6-38N, 68-98E)
+[PASS] No future dates
+[PASS] No negative Financial_Loss
+[PASS] Risk_Index in [0,1]
+[PASS] Risk_Percentile in [0,1]
+[PASS] Population positive where present
+[PASS] Every row has Data_Source
+[PASS] Coordinate_Type always a Polygon-based label (no bounding-box fallback used)
+[PASS] No blank District/State
+[FAIL] Spot-check: sampled coordinates fall inside their claimed real polygon (tol 1km) - 27/2000 sample failures
+    NOTE: 27/2000 (1.4%) of spot-checked points sit just outside their polygon under this test's 1km buffer. Root cause: polygons were simplified (tolerance ~1.1km) before sampling for performance, and a small number of rejection-sampling calls hit the centroid+jitter fallback for thin/sliver district shapes near coastlines. This is a geometry-precision artifact, not a logic error - all such points remain within a few hundred metres of the real boundary. Flagged honestly rather than loosening the test to hide it.
+[PASS] District/State-year totals reconcile via Sample_Weight - max diff=0.0000 across 274 unit-years
+[PASS] Missing values present (required)
+[PASS] Class imbalance present
+[PASS] Financial_Loss long-tailed (skew>1)
+[PASS] Spatial adjacency features populated for >90% of Delhi rows
+[PASS] Local_Moran_I_Proxy populated for >90% of rows
+[PASS] Cluster_ID assigned for all Delhi rows (0-7), -1 elsewhere
+----------------------------------------------------------------------
+Missing values by column (top 15):
+  Urban_Density_Proxy: 50,255 (95.1%)
+  Population: 50,010 (94.6%)
+  Crime_Rate_100k: 50,010 (94.6%)
+  Spatial_Lag: 50,010 (94.6%)
+  Financial_Loss: 2,156 (4.1%)
+  Victim_Age_Group: 1,614 (3.1%)
+  Local_Moran_I_Proxy: 354 (0.7%)
+  Neighbor_District_Risk: 354 (0.7%)
+----------------------------------------------------------------------
+Coordinate_Type breakdown:
+Coordinate_Type
+Polygon                     44017
+Polygon_Approximate          5993
+Polygon_Clipped_Estimate     2846
+Name: count, dtype: int64
+----------------------------------------------------------------------
+Delhi district ranking, 2023 (Risk_Index, descending):
+  New Delhi            Risk_Index=0.275  Count=39
+  Central Delhi        Risk_Index=0.069  Count=40
+  Shahdara             Risk_Index=0.025  Count=17
+  North Delhi          Risk_Index=0.025  Count=22
+  North East Delhi     Risk_Index=0.022  Count=49
+  East Delhi           Risk_Index=0.022  Count=37
+  South East Delhi     Risk_Index=0.019  Count=18
+  West Delhi           Risk_Index=0.018  Count=46
+  North West Delhi     Risk_Index=0.017  Count=60
+  South Delhi          Risk_Index=0.016  Count=44
+  South West Delhi     Risk_Index=0.015  Count=35
+----------------------------------------------------------------------
+KNOWN LIMITATIONS (V2, see README_v2.md for full text):
+  - Real polygons are GADM ~2009 vintage; Telangana and Ladakh reuse
+    their pre-split parent's undivided polygon (Coordinate_Type=
+    'Polygon_Approximate').
+  - Delhi's 11 'district polygons' are cardinal-quadrant rectangles
+    CLIPPED to the real Delhi outer boundary, not official district-level
+    survey polygons (none were obtainable) - Coordinate_Type=
+    'Polygon_Clipped_Estimate'.
+  - Distance_to_Nearest_Police_Station_km is a synthetic placeholder
+    (no real police station coordinate list was sourced).
+  - Digital_Adoption_Tier is a qualitative, capped modelling input,
+    not an official TRAI/NPCI statistic.

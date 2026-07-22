@@ -1,0 +1,19 @@
+# Core ML & Data Processing
+numpy>=1.21.0
+pandas>=1.3.0
+scikit-learn>=1.0.0
+lightgbm>=3.3.0
+pyarrow>=6.0.0  # Parquet support
+
+# Spatial
+h3>=3.7.0  # H3 spatial indexing
+
+# Explainability
+shap>=0.40.0
+
+# Visualization
+matplotlib>=3.4.0
+seaborn>=0.11.0
+
+# Development
+typing-extensions>=4.0.0

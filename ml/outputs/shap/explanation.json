@@ -1,0 +1,265 @@
+{
+  "method": "TreeExplainer",
+  "feature_count": 40,
+  "background_samples": 100,
+  "global_importance": [
+    {
+      "feature": "Rolling_Mean_6m",
+      "mean_abs_shap": 21528.53769432116,
+      "importance_pct": 24.36
+    },
+    {
+      "feature": "Rolling_Mean_3m",
+      "mean_abs_shap": 13405.071230227852,
+      "importance_pct": 15.17
+    },
+    {
+      "feature": "Rolling_Mean_12m",
+      "mean_abs_shap": 10758.023142022255,
+      "importance_pct": 12.17
+    },
+    {
+      "feature": "Crime_Count_District_Lag_1",
+      "mean_abs_shap": 10498.516965551185,
+      "importance_pct": 11.88
+    },
+    {
+      "feature": "EMA_6m",
+      "mean_abs_shap": 8139.489525644396,
+      "importance_pct": 9.21
+    },
+    {
+      "feature": "Crime_Growth",
+      "mean_abs_shap": 3012.7222345681203,
+      "importance_pct": 3.41
+    },
+    {
+      "feature": "Risk_Index",
+      "mean_abs_shap": 2044.7144008145808,
+      "importance_pct": 2.31
+    },
+    {
+      "feature": "Acceleration",
+      "mean_abs_shap": 1749.5790897697443,
+      "importance_pct": 1.98
+    },
+    {
+      "feature": "Crime_Count_District_Lag_2",
+      "mean_abs_shap": 1721.4677890954977,
+      "importance_pct": 1.95
+    },
+    {
+      "feature": "Rolling_Std_12m",
+      "mean_abs_shap": 1522.1705076841351,
+      "importance_pct": 1.72
+    },
+    {
+      "feature": "Crime_Count_District_Lag_9",
+      "mean_abs_shap": 1403.5590372072695,
+      "importance_pct": 1.59
+    },
+    {
+      "feature": "Crime_Count_District_Lag_3",
+      "mean_abs_shap": 1243.1920549337863,
+      "importance_pct": 1.41
+    },
+    {
+      "feature": "Crime_Count_District_Lag_11",
+      "mean_abs_shap": 1118.3194262519837,
+      "importance_pct": 1.27
+    },
+    {
+      "feature": "Rolling_Std_6m",
+      "mean_abs_shap": 1098.8697660314087,
+      "importance_pct": 1.24
+    },
+    {
+      "feature": "Crime_Count_District_Lag_10",
+      "mean_abs_shap": 1022.6815422302247,
+      "importance_pct": 1.16
+    },
+    {
+      "feature": "Quarter_Sin",
+      "mean_abs_shap": 916.5950763974189,
+      "importance_pct": 1.04
+    },
+    {
+      "feature": "Is_Festival_Month",
+      "mean_abs_shap": 822.1148666864397,
+      "importance_pct": 0.93
+    },
+    {
+      "feature": "Month",
+      "mean_abs_shap": 782.1475194020036,
+      "importance_pct": 0.89
+    },
+    {
+      "feature": "Latitude",
+      "mean_abs_shap": 764.5537732623582,
+      "importance_pct": 0.87
+    },
+    {
+      "feature": "Is_Night",
+      "mean_abs_shap": 685.6902479249957,
+      "importance_pct": 0.78
+    },
+    {
+      "feature": "Crime_Count_District_Lag_5",
+      "mean_abs_shap": 566.0867899672032,
+      "importance_pct": 0.64
+    },
+    {
+      "feature": "Month_Cos",
+      "mean_abs_shap": 468.66805333180423,
+      "importance_pct": 0.53
+    },
+    {
+      "feature": "Crime_Count_District_Lag_4",
+      "mean_abs_shap": 441.53644352626793,
+      "importance_pct": 0.5
+    },
+    {
+      "feature": "Crime_Count_District_Lag_7",
+      "mean_abs_shap": 407.3070830168009,
+      "importance_pct": 0.46
+    },
+    {
+      "feature": "Crime_Count_District_Lag_6",
+      "mean_abs_shap": 364.82494290816766,
+      "importance_pct": 0.41
+    },
+    {
+      "feature": "Crime_Count_District_Lag_8",
+      "mean_abs_shap": 326.97041218023304,
+      "importance_pct": 0.37
+    },
+    {
+      "feature": "Year",
+      "mean_abs_shap": 233.40689342956543,
+      "importance_pct": 0.26
+    },
+    {
+      "feature": "Is_Office_Hour",
+      "mean_abs_shap": 220.4744015659571,
+      "importance_pct": 0.25
+    },
+    {
+      "feature": "Longitude",
+      "mean_abs_shap": 189.1444203298569,
+      "importance_pct": 0.21
+    },
+    {
+      "feature": "Momentum",
+      "mean_abs_shap": 163.61404152431484,
+      "importance_pct": 0.19
+    },
+    {
+      "feature": "Rolling_Std_3m",
+      "mean_abs_shap": 162.88775289602282,
+      "importance_pct": 0.18
+    },
+    {
+      "feature": "Is_Weekend",
+      "mean_abs_shap": 141.53868100147247,
+      "importance_pct": 0.16
+    },
+    {
+      "feature": "Quarter",
+      "mean_abs_shap": 136.8985302772522,
+      "importance_pct": 0.15
+    },
+    {
+      "feature": "Quarter_Cos",
+      "mean_abs_shap": 127.93721699867253,
+      "importance_pct": 0.14
+    },
+    {
+      "feature": "Night_Crime_Ratio",
+      "mean_abs_shap": 121.48715183830265,
+      "importance_pct": 0.14
+    },
+    {
+      "feature": "Office_Hour_Ratio",
+      "mean_abs_shap": 41.96389859848023,
+      "importance_pct": 0.05
+    },
+    {
+      "feature": "Month_Sin",
+      "mean_abs_shap": 12.94616260261536,
+      "importance_pct": 0.01
+    },
+    {
+      "feature": "Weekend_Ratio",
+      "mean_abs_shap": 7.432431555175779,
+      "importance_pct": 0.01
+    },
+    {
+      "feature": "Neighbor_Crime_Density",
+      "mean_abs_shap": 0.0,
+      "importance_pct": 0.0
+    },
+    {
+      "feature": "Population_Normalized_Crime",
+      "mean_abs_shap": 0.0,
+      "importance_pct": 0.0
+    }
+  ],
+  "sample_local_explanation": {
+    "row_index": 0,
+    "top_positive_features": [
+      {
+        "feature": "Crime_Count_District_Lag_4",
+        "shap_value": 2167.4078,
+        "feature_value": 0.0
+      },
+      {
+        "feature": "Risk_Index",
+        "shap_value": 1227.8396,
+        "feature_value": 0.0602
+      },
+      {
+        "feature": "Crime_Count_District_Lag_5",
+        "shap_value": 1103.4766,
+        "feature_value": 0.0
+      },
+      {
+        "feature": "Crime_Count_District_Lag_7",
+        "shap_value": 617.0698,
+        "feature_value": 0.0
+      },
+      {
+        "feature": "Crime_Count_District_Lag_3",
+        "shap_value": 554.6631,
+        "feature_value": 0.0
+      }
+    ],
+    "top_negative_features": [
+      {
+        "feature": "Rolling_Mean_6m",
+        "shap_value": -12102.6624,
+        "feature_value": 105.0
+      },
+      {
+        "feature": "Rolling_Mean_3m",
+        "shap_value": -10829.1242,
+        "feature_value": 105.0
+      },
+      {
+        "feature": "Crime_Count_District_Lag_1",
+        "shap_value": -8857.396,
+        "feature_value": 140.0
+      },
+      {
+        "feature": "Rolling_Mean_12m",
+        "shap_value": -8663.3865,
+        "feature_value": 105.0
+      },
+      {
+        "feature": "EMA_6m",
+        "shap_value": -6098.8686,
+        "feature_value": 90.0
+      }
+    ],
+    "base_value": 58194.6285
+  }
+}
