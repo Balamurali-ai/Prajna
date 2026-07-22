@@ -35,14 +35,10 @@ export function LoginPage() {
         })
         if (sbError) throw sbError
         if (data.session) {
-          // Fetch user from backend to get role
+          // Only keep a Supabase session after the backend accepts that token.
           const { authApi } = await import('@api/index')
-          const user = await authApi.me()
-          setSession(
-            data.session.access_token,
-            user,
-            data.session.expires_in ?? 3600
-          )
+          const user = await authApi.me(data.session.access_token)
+          setSession(data.session.access_token, user, data.session.expires_in ?? 3600)
           navigate('/dashboard')
           return
         }

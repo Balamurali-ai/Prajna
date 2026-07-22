@@ -6,6 +6,7 @@ Creates a development admin user and basic data
 for local testing. NEVER run in production.
 ====================================================
 """
+
 import asyncio
 import sys
 from pathlib import Path
@@ -24,7 +25,9 @@ from sqlalchemy import select  # noqa: E402
 async def seed():
     """Insert seed data."""
     await init_db()
-    print("🌱 Seeding development data...")
+    print("Seeding development data...")
+
+    demo_password_hash = hash_password("123456")
 
     async for db in get_db():
         # Check existing
@@ -33,7 +36,12 @@ async def seed():
         )
         existing = result.scalar_one_or_none()
         if existing:
-            print("   Admin already exists, skipping")
+            existing.password_hash = demo_password_hash
+            existing.role = UserRole.ADMIN
+            existing.status = UserStatus.ACTIVE
+            existing.is_deleted = False
+            await db.commit()
+            print("   Updated existing admin password for dev login")
             return
 
         # Create admin
@@ -46,6 +54,7 @@ async def seed():
             status=UserStatus.ACTIVE,
             department="Command Center",
             badge_number="ADMIN-001",
+            password_hash=demo_password_hash,
         )
         db.add(admin)
 
@@ -59,6 +68,7 @@ async def seed():
             status=UserStatus.ACTIVE,
             department="Field Operations",
             badge_number="OFF-001",
+            password_hash=demo_password_hash,
         )
         db.add(officer)
 
@@ -72,15 +82,16 @@ async def seed():
             status=UserStatus.ACTIVE,
             department="Crime Analytics",
             badge_number="ANL-001",
+            password_hash=demo_password_hash,
         )
         db.add(analyst)
 
         await db.commit()
-        print("   ✅ Created admin, officer, analyst")
+        print("   Created admin, officer, analyst")
         break
 
     await close_db()
-    print("🎉 Seeding complete!")
+    print("Seeding complete!")
 
 
 if __name__ == "__main__":

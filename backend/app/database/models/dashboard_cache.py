@@ -6,6 +6,7 @@ Stores pre-computed dashboard payloads to reduce
 repeated file reads of ML artifacts.
 ====================================================
 """
+
 from __future__ import annotations
 
 from datetime import datetime
@@ -31,6 +32,7 @@ from app.database.session import Base
 
 class CacheType(str, Enum):
     """Types of dashboard cache."""
+
     METRICS = "metrics"
     RISK_RANKINGS = "risk_rankings"
     HOTSPOTS = "hotspots"
@@ -60,7 +62,11 @@ class DashboardCache(Base):
     # Cache key (unique identifier)
     cache_key: Mapped[str] = mapped_column(String(500), nullable=False, unique=True)
     cache_type: Mapped[CacheType] = mapped_column(
-        SQLEnum(CacheType, name="cache_type"),
+        SQLEnum(
+            CacheType,
+            name="cache_type",
+            values_callable=lambda enum: [e.value for e in enum],
+        ),
         nullable=False,
     )
 
@@ -74,7 +80,9 @@ class DashboardCache(Base):
 
     # Expiration
     ttl_seconds: Mapped[int] = mapped_column(Integer, default=300, nullable=False)
-    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    expires_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False
+    )
     last_refreshed_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=func.now(),
@@ -100,4 +108,5 @@ class DashboardCache(Base):
     @property
     def is_expired(self) -> bool:
         from datetime import timezone
+
         return datetime.now(timezone.utc) >= self.expires_at

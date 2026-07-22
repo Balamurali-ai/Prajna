@@ -5,6 +5,7 @@ Saved Report Model
 Stores user-generated reports with metadata.
 ====================================================
 """
+
 from __future__ import annotations
 
 from datetime import datetime
@@ -31,6 +32,7 @@ from app.database.session import Base
 
 class ReportFormat(str, Enum):
     """Report output format."""
+
     CSV = "csv"
     PDF = "pdf"
     GEOJSON = "geojson"
@@ -39,6 +41,7 @@ class ReportFormat(str, Enum):
 
 class ReportStatus(str, Enum):
     """Report generation status."""
+
     PENDING = "pending"
     PROCESSING = "processing"
     COMPLETED = "completed"
@@ -48,6 +51,7 @@ class ReportStatus(str, Enum):
 
 class ReportType(str, Enum):
     """Type of report."""
+
     DASHBOARD_SUMMARY = "dashboard_summary"
     RISK_RANKING = "risk_ranking"
     HOTSPOT_ANALYSIS = "hotspot_analysis"
@@ -86,15 +90,27 @@ class SavedReport(Base):
     title: Mapped[str] = mapped_column(String(500), nullable=False)
     description: Mapped[Optional[str]] = mapped_column(Text)
     report_type: Mapped[ReportType] = mapped_column(
-        SQLEnum(ReportType, name="report_type"),
+        SQLEnum(
+            ReportType,
+            name="report_type",
+            values_callable=lambda enum: [e.value for e in enum],
+        ),
         nullable=False,
     )
     format: Mapped[ReportFormat] = mapped_column(
-        SQLEnum(ReportFormat, name="report_format"),
+        SQLEnum(
+            ReportFormat,
+            name="report_format",
+            values_callable=lambda enum: [e.value for e in enum],
+        ),
         nullable=False,
     )
     status: Mapped[ReportStatus] = mapped_column(
-        SQLEnum(ReportStatus, name="report_status"),
+        SQLEnum(
+            ReportStatus,
+            name="report_status",
+            values_callable=lambda enum: [e.value for e in enum],
+        ),
         default=ReportStatus.PENDING,
         nullable=False,
     )
@@ -114,8 +130,12 @@ class SavedReport(Base):
     retry_count: Mapped[int] = mapped_column(BigInteger, default=0, nullable=False)
 
     # Timing
-    generation_started_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
-    generation_completed_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
+    generation_started_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True)
+    )
+    generation_completed_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True)
+    )
     expires_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
 
     # Audit

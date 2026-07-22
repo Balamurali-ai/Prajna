@@ -36,7 +36,6 @@ export const useAuthStore = create<AuthState>()(
       error: null,
 
       setSession: (token, user, expiresIn) => {
-        localStorage.setItem('access_token', token)
         set({
           token,
           user,
@@ -49,7 +48,6 @@ export const useAuthStore = create<AuthState>()(
       setUser: (user) => set({ user }),
 
       logout: () => {
-        localStorage.removeItem('access_token')
         set({
           user: null,
           token: null,
@@ -64,9 +62,9 @@ export const useAuthStore = create<AuthState>()(
         try {
           const user = await authApi.me()
           set({ user, isLoading: false })
-        } catch (err) {
-          set({ isLoading: false, error: (err as Error).message })
-          get().logout()
+        } catch {
+          // Don't logout on fetchMe failure — keep existing session intact
+          set({ isLoading: false })
         }
       },
 

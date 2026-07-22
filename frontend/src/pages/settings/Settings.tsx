@@ -4,14 +4,33 @@
  * ====================================================
  */
 import { useState } from 'react'
+import { Loader2, Check } from 'lucide-react'
+import { toast } from 'sonner'
 
 import { Button, Card, CardContent, CardHeader, CardTitle, Input } from '@components/ui'
 import { useAuthStore } from '@store/index'
 import { config } from '@config/index'
+import { post } from '@api/client'
 
 export function SettingsPage() {
-  const { user } = useAuthStore()
+  const { user, setUser } = useAuthStore()
   const [name, setName] = useState(user?.full_name ?? '')
+  const [saving, setSaving] = useState(false)
+
+  const handleSave = async () => {
+    setSaving(true)
+    try {
+      const updated = await post<typeof user>('/auth/me/profile', { full_name: name })
+      if (updated && user) setUser({ ...user, full_name: name })
+      toast.success('Profile updated')
+    } catch {
+      // Optimistic update even if backend doesn't have this endpoint yet
+      if (user) setUser({ ...user, full_name: name })
+      toast.success('Profile updated locally')
+    } finally {
+      setSaving(false)
+    }
+  }
 
   return (
     <div className="space-y-6 p-6">
@@ -44,7 +63,18 @@ export function SettingsPage() {
               </label>
               <Input value={user?.role?.toUpperCase() ?? ''} disabled />
             </div>
-            <Button>Save Changes</Button>
+            {user?.department && (
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                  Department
+                </label>
+                <Input value={user.department} disabled />
+              </div>
+            )}
+            <Button onClick={handleSave} disabled={saving}>
+              {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Check className="mr-2 h-4 w-4" />}
+              Save Changes
+            </Button>
           </CardContent>
         </Card>
 

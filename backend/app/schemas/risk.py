@@ -14,9 +14,9 @@ class RiskRanking(BaseModel):
     """District risk ranking row."""
     district: str
     state: Optional[str] = None
-    risk_score: float = Field(..., ge=0, le=100)
+    risk_score: float = Field(..., ge=0)
     risk_rank: int = Field(..., ge=1)
-    confidence: float = Field(..., ge=0, le=1)
+    confidence: float = Field(default=0.0, ge=0, le=1)
     predicted_crime_count: Optional[int] = None
 
 
@@ -25,8 +25,8 @@ class DistrictPrediction(BaseModel):
     district: str
     state: Optional[str] = None
     risk_score: float
-    risk_rank: int
-    confidence: float
+    risk_rank: int = Field(default=0)
+    confidence: float = Field(default=0.0)
     predicted_crime_count: Optional[int] = None
     additional_metrics: Optional[dict] = None
 

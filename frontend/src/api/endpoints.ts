@@ -100,7 +100,11 @@ export const reportsApi = {
 // Auth
 // ====================================================
 export const authApi = {
-  me: () => get<User>('/auth/me'),
+  me: (token?: string) =>
+    get<User>(
+      '/auth/me',
+      token ? { headers: { Authorization: `Bearer ${token}` } } : undefined
+    ),
   login: (email: string, password: string) =>
     post<{ access_token: string; user: User; expires_in: number }>('/auth/login', {
       email,
@@ -121,7 +125,7 @@ export const adminApi = {
   listUsers: (skip = 0, limit = 50) =>
     get<User[]>(`/admin/users?skip=${skip}&limit=${limit}`),
   getUser: (id: string) => get<User>(`/admin/users/${id}`),
-  updateUser: (id: string, payload: Partial<User>) =>
+  updateUser: (id: string, payload: Partial<Pick<User, 'role' | 'full_name' | 'department' | 'badge_number'>>) =>
     patch<User>(`/admin/users/${id}`, payload),
   deleteUser: (id: string) => del<void>(`/admin/users/${id}`),
 }

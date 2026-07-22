@@ -1,17 +1,7 @@
 {
-  "total_crime_count": 248539346,
-  "avg_monthly_crime": 4702.2,
-  "total_districts": 46,
-  "years_covered": [
-    2021,
-    2022,
-    2023,
-    2024,
-    2025,
-    2026
-  ],
-  "top_risk_district": "Karnataka",
-  "top_risk_score": 100.0,
-  "crime_categories": 12,
-  "top_category": "UPI Fraud"
+  "total_crimes": 10040,
+  "hotspot_count": 10,
+  "average_risk_score": 68.24,
+  "high_risk_districts": 3,
+  "trend_direction": "stable"
 }

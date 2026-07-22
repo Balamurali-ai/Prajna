@@ -67,37 +67,65 @@ class DashboardService:
         )
 
     def _build_top_districts(self, n: int = 10) -> list[RiskRanking]:
-        df = self.ml_loader.get_top_n(n)
-        results = []
-        for _, row in df.iterrows():
-            results.append(
-                RiskRanking(
-                    district=str(row.get("district", "")),
-                    state=row.get("state"),
-                    risk_score=float(row.get("risk_score", 0)),
-                    risk_rank=int(row.get("risk_rank", 0)),
-                    confidence=float(row.get("confidence", 0)),
-                    predicted_crime_count=(
-                        int(row["predicted_crime_count"])
-                        if "predicted_crime_count" in row and not _isnan(row["predicted_crime_count"])
-                        else None
-                    ),
+        try:
+            df = self.ml_loader.get_top_n(n)
+            results = []
+            for _, row in df.iterrows():
+                results.append(
+                    RiskRanking(
+                        district=str(row.get("district", "")),
+                        state=row.get("state"),
+                        risk_score=float(row.get("risk_score", 0)),
+                        risk_rank=int(row.get("risk_rank", 0)),
+                        confidence=float(row.get("confidence", 0)),
+                        predicted_crime_count=(
+                            int(row["predicted_crime_count"])
+                            if "predicted_crime_count" in row and not _isnan(row["predicted_crime_count"])
+                            else None
+                        ),
+                    )
                 )
-            )
-        return results
+            if results:
+                return results
+        except Exception:
+            pass
+        # Fallback: analytics_report risk_rankings
+        try:
+            raw = self.ml_loader.get_analytics_report()
+            rankings = raw.get("risk_rankings", [])[:n]
+            return [
+                RiskRanking(district=r["district"], risk_score=float(r["score"]), risk_rank=int(r["rank"]))
+                for r in rankings
+            ]
+        except Exception:
+            return []
 
     def _build_top_hotspots(self, n: int = 10) -> list[HotspotRanking]:
-        df = self.ml_loader.get_top_hotspots(n)
-        results = []
-        for _, row in df.iterrows():
-            results.append(
-                HotspotRanking(
-                    h3_cell=str(row.get("h3_cell", "")),
-                    hotspot_score=float(row.get("hotspot_score", 0)),
-                    rank=int(row.get("rank", 0)),
+        try:
+            df = self.ml_loader.get_top_hotspots(n)
+            results = []
+            for _, row in df.iterrows():
+                results.append(
+                    HotspotRanking(
+                        h3_cell=str(row.get("h3_cell", "")),
+                        hotspot_score=float(row.get("hotspot_score", 0)),
+                        rank=int(row.get("rank", 0)),
+                    )
                 )
-            )
-        return results
+            if results:
+                return results
+        except Exception:
+            pass
+        # Fallback: top districts as hotspot proxies
+        try:
+            raw = self.ml_loader.get_analytics_report()
+            rankings = raw.get("risk_rankings", [])[:n]
+            return [
+                HotspotRanking(h3_cell=r["district"], hotspot_score=float(r["score"]), rank=int(r["rank"]))
+                for r in rankings
+            ]
+        except Exception:
+            return []
 
     def _build_alerts(
         self,

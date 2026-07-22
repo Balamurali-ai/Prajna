@@ -68,7 +68,7 @@ def _create_engine() -> AsyncEngine:
         pool_timeout=settings.DATABASE_POOL_TIMEOUT,
         pool_pre_ping=True,
         pool_recycle=3600,
-        connect_args={"prepared_statement_cache_size": 0},
+        connect_args={"prepared_statement_cache_size": 0, "timeout": 10},
     )
 
 
@@ -98,7 +98,7 @@ def _get_engine() -> AsyncEngine:
 
 
 async def init_db() -> bool:
-    """Initialize database connection."""
+    """Initialize database connection. Non-fatal in development."""
     try:
         _log_database_target()
         db_engine = _get_engine()
@@ -107,8 +107,11 @@ async def init_db() -> bool:
         logger.info("Database connection established")
         return True
     except Exception as exc:
-        logger.error(f"Database connection failed: {exc}")
-        raise RuntimeError(f"Database connection failed: {exc}") from exc
+        logger.warning(f"Database connection failed: {exc}")
+        if settings.APP_ENV == "production":
+            raise RuntimeError(f"Database connection failed: {exc}") from exc
+        logger.warning("⚠️  Running without database (development mode)")
+        return False
 
 
 async def close_db() -> None:

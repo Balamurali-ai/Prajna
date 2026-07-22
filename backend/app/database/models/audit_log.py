@@ -5,6 +5,7 @@ Audit Log Model
 Append-only log of all user actions.
 ====================================================
 """
+
 from __future__ import annotations
 
 from datetime import datetime
@@ -31,6 +32,7 @@ from app.database.session import Base
 
 class AuditAction(str, Enum):
     """Audit log action types."""
+
     LOGIN = "login"
     LOGOUT = "logout"
     LOGIN_FAILED = "login_failed"
@@ -92,7 +94,11 @@ class AuditLog(Base):
 
     # Action
     action: Mapped[AuditAction] = mapped_column(
-        SQLEnum(AuditAction, name="audit_action"),
+        SQLEnum(
+            AuditAction,
+            name="audit_action",
+            values_callable=lambda enum: [e.value for e in enum],
+        ),
         nullable=False,
     )
 

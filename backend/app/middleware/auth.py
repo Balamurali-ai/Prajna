@@ -99,7 +99,7 @@ async def get_current_user_payload(
 async def get_current_user(
     request: Request,
     payload: TokenPayload = Depends(get_current_user_payload),
-    db = None,
+    db: AsyncSession = Depends(get_db),
 ):
     """Fetch current user from database (or auto-provision).
 
@@ -107,7 +107,7 @@ async def get_current_user(
     """
     # Dev bypass: synthetic user object, no DB lookup
     if (
-        request.state.token_payload.get("email", "").endswith("@example.com")
+        getattr(request.state, "token_payload", {}).get("email", "").endswith("@example.com")
         and settings.APP_ENV != "production"
     ):
         from datetime import datetime as _dt, timezone as _tz
@@ -142,11 +142,21 @@ async def get_current_user(
 
     if not user:
         # Auto-provision from Supabase token on first login
+        raw = getattr(payload, "model_extra", {}) or {}
+        role_str = (
+            payload.role
+            or (raw.get("app_metadata") or {}).get("role")
+            or (raw.get("user_metadata") or {}).get("role")
+        )
+        try:
+            role = UserRole(role_str) if role_str else UserRole.ANALYST
+        except ValueError:
+            role = UserRole.ANALYST
         user = User(
-            supabase_user_id=UUID(payload.sub) if _is_uuid(payload.sub) else UUID(int=0),
+            supabase_user_id=UUID(payload.sub) if _is_uuid(payload.sub) else uuid4(),
             email=payload.email or "",
-            full_name=payload.email,  # placeholder
-            role=UserRole(payload.role) if payload.role else UserRole.ANALYST,
+            full_name=payload.email,
+            role=role,
         )
         user = await repo.create(user)
         logger.info(f"Auto-provisioned new user: {user.email}")

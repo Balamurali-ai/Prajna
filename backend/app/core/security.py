@@ -88,17 +88,29 @@ def decode_token(token: str) -> dict[str, Any]:
 # ====================================================
 def validate_supabase_token(token: str) -> dict[str, Any]:
     """
-    Validate a Supabase JWT token.
-
-    Returns the decoded payload containing user info and role.
+    Validate a JWT token — accepts both Supabase-issued and
+    backend-issued tokens.
     """
+    # Try Supabase token (aud=authenticated, no issuer check)
     try:
-        # Use the JWT secret to validate
         payload = jwt.decode(
             token,
             settings.SUPABASE_JWT_SECRET,
             algorithms=[settings.JWT_ALGORITHM],
             audience=settings.JWT_AUDIENCE,
+        )
+        return payload
+    except jwt.InvalidTokenError:
+        pass
+
+    # Try backend-issued token (aud + iss)
+    try:
+        payload = jwt.decode(
+            token,
+            settings.SUPABASE_JWT_SECRET,
+            algorithms=[settings.JWT_ALGORITHM],
+            audience=settings.JWT_AUDIENCE,
+            issuer=settings.JWT_ISSUER,
         )
         return payload
     except jwt.ExpiredSignatureError:

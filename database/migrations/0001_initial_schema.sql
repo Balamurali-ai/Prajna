@@ -65,6 +65,7 @@ CREATE TABLE IF NOT EXISTS users (
     full_name VARCHAR(255),
     avatar_url TEXT,
     phone VARCHAR(50),
+    password_hash VARCHAR(255),
     role user_role NOT NULL DEFAULT 'analyst',
     status user_status NOT NULL DEFAULT 'active',
     department VARCHAR(255),
@@ -78,6 +79,9 @@ CREATE TABLE IF NOT EXISTS users (
     created_by UUID,
     is_deleted BOOLEAN NOT NULL DEFAULT FALSE
 );
+
+ALTER TABLE IF EXISTS users
+    ADD COLUMN IF NOT EXISTS password_hash VARCHAR(255);
 
 CREATE INDEX IF NOT EXISTS ix_users_email ON users(email);
 CREATE INDEX IF NOT EXISTS ix_users_role ON users(role);

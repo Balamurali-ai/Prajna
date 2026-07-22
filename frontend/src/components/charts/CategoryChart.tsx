@@ -19,7 +19,7 @@ const COLORS = ['#3b82f6', '#10b981', '#eab308', '#f97316', '#ef4444', '#8b5cf6'
 
 interface CategoryChartProps {
   title: string
-  data: Array<{ name: string; value: number; percentage: number }>
+  data: Array<{ name: string; count: number; percentage: number }>
   loading?: boolean
   height?: number
 }
@@ -53,7 +53,7 @@ export function CategoryChart({
                 innerRadius={50}
                 outerRadius={90}
                 paddingAngle={2}
-                dataKey="value"
+                dataKey="count"
               >
                 {data.map((_, i) => (
                   <Cell key={i} fill={COLORS[i % COLORS.length]} />

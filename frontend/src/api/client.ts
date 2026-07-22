@@ -15,12 +15,23 @@ const client: AxiosInstance = axios.create({
   },
 })
 
+// Read token from Zustand persisted store — single source of truth
+function getToken(): string | null {
+  try {
+    const raw = localStorage.getItem('crime-intel-auth')
+    if (!raw) return null
+    return (JSON.parse(raw)?.state?.token as string) ?? null
+  } catch {
+    return null
+  }
+}
+
 // ====================================================
 // Request Interceptor — Attach Auth Token
 // ====================================================
 client.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('access_token')
+    const token = getToken()
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
     }
@@ -36,9 +47,13 @@ client.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('access_token')
-      if (!window.location.pathname.startsWith('/login')) {
-        window.location.href = '/login'
+      const url = error.config?.url ?? ''
+      // Don't wipe session for background session-check calls
+      if (!url.includes('/auth/me')) {
+        localStorage.removeItem('crime-intel-auth')
+        if (!window.location.pathname.startsWith('/login')) {
+          window.location.href = '/login'
+        }
       }
     }
     return Promise.reject(error)

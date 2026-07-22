@@ -26,7 +26,6 @@ from app.database.models.user import User, UserRole, UserStatus
 from app.middleware.auth import get_current_user
 from app.repositories.user_repository import UserRepository
 from app.schemas.user import UserCreate, UserLogin, UserResponse
-
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 
@@ -142,3 +141,24 @@ async def get_me(
     current_user: User = Depends(get_current_user),
 ):
     return UserResponse.model_validate(current_user)
+
+
+class UpdateProfileRequest(BaseModel):
+    full_name: Optional[str] = None
+
+
+@router.post(
+    "/me/profile",
+    response_model=UserResponse,
+    summary="Update current user profile",
+)
+async def update_profile(
+    payload: UpdateProfileRequest,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    repo = UserRepository(db)
+    if payload.full_name is not None:
+        current_user.full_name = payload.full_name
+    user = await repo.update(current_user)
+    return UserResponse.model_validate(user)

@@ -176,9 +176,12 @@ function ReportRow({ report, onDelete }: { report: Report; onDelete: () => void 
   const StatusIcon = cfg.icon
 
   const handleDownload = () => {
-    const token = localStorage.getItem('access_token')
+    let token: string | null = null
+    try {
+      const raw = localStorage.getItem('crime-intel-auth')
+      token = raw ? (JSON.parse(raw)?.state?.token ?? null) : null
+    } catch { /* ignore */ }
     if (!token) return
-    // Use fetch + blob to send Authorization header
     fetch(reportsApi.downloadUrl(report.id), {
       headers: { Authorization: `Bearer ${token}` },
     })

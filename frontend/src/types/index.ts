@@ -127,7 +127,7 @@ export interface DashboardData {
 export interface TrendsData {
   direction: string
   percentage_change?: number
-  monthly?: Array<{ month: string; value: number }>
+  monthly?: Array<{ month: number | string; value: number }>
   yearly?: Array<{ year: number; value: number }>
   summary?: string
 }
@@ -140,7 +140,7 @@ export interface Seasonality {
 }
 
 export interface CategoryDistribution {
-  categories?: Array<{ name: string; value: number; percentage: number }>
+  categories?: Array<{ name: string; count: number; percentage: number }>
   total_crimes?: number
 }
 

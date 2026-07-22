@@ -5,6 +5,7 @@ User Model
 Represents a user in the system (synced with Supabase Auth).
 ====================================================
 """
+
 from __future__ import annotations
 
 from datetime import datetime
@@ -30,6 +31,7 @@ from app.database.session import Base
 
 class UserRole(str, Enum):
     """User role enum."""
+
     ADMIN = "admin"
     OFFICER = "officer"
     ANALYST = "analyst"
@@ -37,6 +39,7 @@ class UserRole(str, Enum):
 
 class UserStatus(str, Enum):
     """User account status."""
+
     ACTIVE = "active"
     INACTIVE = "inactive"
     SUSPENDED = "suspended"
@@ -81,12 +84,20 @@ class User(Base):
 
     # Role & status
     role: Mapped[UserRole] = mapped_column(
-        SQLEnum(UserRole, name="user_role"),
+        SQLEnum(
+            UserRole,
+            name="user_role",
+            values_callable=lambda enum: [e.value for e in enum],
+        ),
         default=UserRole.ANALYST,
         nullable=False,
     )
     status: Mapped[UserStatus] = mapped_column(
-        SQLEnum(UserStatus, name="user_status"),
+        SQLEnum(
+            UserStatus,
+            name="user_status",
+            values_callable=lambda enum: [e.value for e in enum],
+        ),
         default=UserStatus.ACTIVE,
         nullable=False,
     )

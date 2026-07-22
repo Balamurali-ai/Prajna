@@ -58,10 +58,12 @@ class UserResponse(BaseModel):
 
 class TokenPayload(BaseModel):
     """Decoded JWT token payload."""
-    sub: str  # user id
+    sub: str
     email: Optional[str] = None
     role: Optional[UserRole] = None
     exp: Optional[int] = None
     iat: Optional[int] = None
     iss: Optional[str] = None
-    aud: Optional[str] = None
+    aud: Optional[str | list[str]] = None
+
+    model_config = {"extra": "allow"}

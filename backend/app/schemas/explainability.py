@@ -20,6 +20,8 @@ class FeatureImportance(BaseModel):
 
 class GlobalExplanation(BaseModel):
     """Global SHAP explanation."""
+    model_config = {"protected_namespaces": ()}
+
     features: List[FeatureImportance]
     base_value: Optional[float] = None
     model_type: Optional[str] = None

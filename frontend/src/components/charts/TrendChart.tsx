@@ -16,9 +16,11 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@components/ui'
 import { formatCompact } from '@utils/index'
 
+const MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+
 interface TrendChartProps {
   title: string
-  data: Array<{ month: string; value: number }> | Array<{ year: number; value: number }>
+  data: Array<{ month: number | string; value: number }> | Array<{ year: number; value: number }>
   dataKey?: string
   color?: string
   loading?: boolean
@@ -34,10 +36,13 @@ export function TrendChart({
   height = 280,
 }: TrendChartProps) {
   const xKey = 'month' in (data?.[0] ?? {}) ? 'month' : 'year'
-  const displayData = data?.map((d) => ({
-    label: String(d[xKey as keyof typeof d] ?? ''),
-    [dataKey]: d.value,
-  }))
+  const displayData = data?.map((d) => {
+    const raw = d[xKey as keyof typeof d]
+    const label = typeof raw === 'number' && xKey === 'month'
+      ? MONTH_NAMES[(raw - 1) % 12]
+      : String(raw ?? '')
+    return { label, [dataKey]: d.value }
+  })
 
   return (
     <Card className="border-border/60">

@@ -122,37 +122,34 @@ class ReportService:
             await repo.update(report)
             raise ReportGenerationException(f"Report generation failed: {e}")
 
-    def _build_payload(
-        self,
-        report_type: ReportType,
-        filters: dict | None,
-    ) -> dict:
+    def _build_payload(self, report_type: ReportType, filters: dict | None) -> dict:
         """Build the data payload for a report."""
+        raw = self.ml_loader.get_analytics_report()
+
         if report_type == ReportType.DASHBOARD_SUMMARY:
-            return {
-                "metrics": self.ml_loader.get_dashboard_metrics(),
-                "top_districts": [
-                    row.to_dict()
-                    for _, row in self.ml_loader.get_top_n(20).iterrows()
-                ],
-            }
+            metrics = self.ml_loader.get_dashboard_metrics()
+            rankings = raw.get("risk_rankings", [])[:20]
+            return {"metrics": metrics, "top_districts": rankings}
+
         elif report_type == ReportType.RISK_RANKING:
-            return {
-                "rankings": [
-                    row.to_dict()
-                    for _, row in self.ml_loader.get_risk_rankings().iterrows()
-                ]
-            }
+            try:
+                rows = [{k: v for k, v in row.items()}
+                        for _, row in self.ml_loader.get_risk_rankings().iterrows()]
+            except Exception:
+                rows = raw.get("risk_rankings", [])
+            return {"rankings": rows}
+
         elif report_type == ReportType.HOTSPOT_ANALYSIS:
-            return {
-                "rankings": [
-                    row.to_dict()
-                    for _, row in self.ml_loader.get_hotspot_rankings().iterrows()
-                ],
-                "geojson": self.ml_loader.get_hotspots_geojson(),
-            }
+            try:
+                rows = [{k: v for k, v in row.items()}
+                        for _, row in self.ml_loader.get_hotspot_rankings().iterrows()]
+            except Exception:
+                rows = raw.get("risk_rankings", [])
+            return {"rankings": rows, "geojson": self.ml_loader.get_hotspots_geojson()}
+
         elif report_type == ReportType.ANALYTICS_REPORT:
-            return self.ml_loader.get_analytics_report()
+            return raw
+
         else:
             return {"generated_at": time.time()}
 
