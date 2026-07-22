@@ -66,7 +66,7 @@ export function LoginPage() {
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-purple-600">
             <Shield className="h-7 w-7 text-white" />
           </div>
-          <h1 className="mt-4 text-2xl font-bold">Crime Intelligence Platform</h1>
+          <h1 className="mt-4 text-2xl font-bold">Prajna</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Geospatial Pattern Intelligence — Command Center
           </p>
@@ -91,7 +91,7 @@ export function LoginPage() {
                   <Input
                     type="email"
                     required
-                    placeholder="officer@crime-intel.gov"
+                    placeholder="officer@prajna.gov"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="pl-9"
@@ -128,7 +128,7 @@ export function LoginPage() {
               </Button>
 
               <p className="text-center text-xs text-muted-foreground">
-                Secured by Supabase Auth • {config.app.name}
+                Secured by Supabase Auth • Prajna
               </p>
             </form>
           </CardContent>

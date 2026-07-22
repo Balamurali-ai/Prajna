@@ -87,7 +87,7 @@ export function SettingsPage() {
             <Row label="Version" value={config.app.version} />
             <Row label="Environment" value={config.app.env} />
             <Row label="API URL" value={config.api.baseUrl} />
-            <Row label="Mapbox Style" value={config.mapbox.style} />
+            <Row label="Map Center" value={config.map.defaultCenter.join(', ')} />
           </CardContent>
         </Card>
       </div>

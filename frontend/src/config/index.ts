@@ -24,7 +24,7 @@ const wsBaseUrl = trimTrailingSlash(env.VITE_WS_BASE_URL)
 
 export const config = {
   app: {
-    name: env.VITE_APP_NAME ?? 'Crime Intelligence Platform',
+    name: env.VITE_APP_NAME ?? 'Prajna',
     version: env.VITE_APP_VERSION ?? '1.0.0',
     env: env.VITE_APP_ENV ?? 'development',
   },
@@ -37,13 +37,11 @@ export const config = {
     url: env.VITE_SUPABASE_URL ?? '',
     anonKey: env.VITE_SUPABASE_ANON_KEY ?? '',
   },
-  mapbox: {
-    token: env.VITE_MAPBOX_PUBLIC_TOKEN ?? '',
-    style: env.VITE_MAPBOX_STYLE ?? 'dark-v11',
-    defaultCenter: (env.VITE_DEFAULT_MAP_CENTER ?? '78.9629,20.5937')
+  map: {
+    defaultCenter: (env.VITE_DEFAULT_MAP_CENTER ?? '20.5937,78.9629')
       .split(',')
       .map(Number) as [number, number],
-    defaultZoom: Number(env.VITE_DEFAULT_MAP_ZOOM ?? 4),
+    defaultZoom: Number(env.VITE_DEFAULT_MAP_ZOOM ?? 5),
   },
   features: {
     websockets: env.VITE_FEATURE_WEBSOCKETS === 'true',

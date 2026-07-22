@@ -105,12 +105,11 @@ def create_app() -> FastAPI:
     """
     # ----- App Instance -----
     app = FastAPI(
-        title=settings.APP_NAME,
+        title="Prajna",
         version=settings.APP_VERSION,
         description=(
-            "Geospatial Crime Pattern Intelligence Platform — "
-            "Police Command-Center Dashboard API. "
-            "Serves pre-computed ML outputs (predictions, hotspots, SHAP, analytics)."
+            "Prajna — Geospatial Crime Pattern Intelligence Platform. "
+            "Police Command-Center Dashboard API."
         ),
         docs_url="/docs" if settings.APP_DEBUG else None,
         redoc_url="/redoc" if settings.APP_DEBUG else None,
@@ -138,17 +137,18 @@ def create_app() -> FastAPI:
 
     # 5. CORS
     app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://localhost:5174",
-        "http://127.0.0.1:5173",
-        "http://127.0.0.1:5174",
-    ],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+        CORSMiddleware,
+        allow_origins=[
+            "http://localhost:5173",
+            "http://localhost:5174",
+            "http://127.0.0.1:5173",
+            "http://127.0.0.1:5174",
+            "https://prajna-1-0osj.onrender.com",
+        ] + settings.CORS_ORIGINS,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
     # 6. GZip compression
     app.add_middleware(GZipMiddleware, minimum_size=1000)
