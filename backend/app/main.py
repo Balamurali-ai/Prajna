@@ -105,12 +105,11 @@ def create_app() -> FastAPI:
     """
     # ----- App Instance -----
     app = FastAPI(
-        title=settings.APP_NAME,
+        title="Prajna",
         version=settings.APP_VERSION,
         description=(
-            "Geospatial Crime Pattern Intelligence Platform — "
-            "Police Command-Center Dashboard API. "
-            "Serves pre-computed ML outputs (predictions, hotspots, SHAP, analytics)."
+            "Prajna — Geospatial Crime Pattern Intelligence Platform. "
+            "Police Command-Center Dashboard API."
         ),
         docs_url="/docs" if settings.APP_DEBUG else None,
         redoc_url="/redoc" if settings.APP_DEBUG else None,

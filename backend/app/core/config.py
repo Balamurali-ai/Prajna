@@ -32,7 +32,7 @@ class Settings(BaseSettings):
     )
 
     # ----- Application -----
-    APP_NAME: str = "crime-intelligence-backend"
+    APP_NAME: str = "prajna-backend"
     APP_ENV: Literal["development", "staging", "production", "test"] = "development"
     APP_VERSION: str = "1.0.0"
     APP_DEBUG: bool = True

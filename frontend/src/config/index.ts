@@ -24,7 +24,7 @@ const wsBaseUrl = trimTrailingSlash(env.VITE_WS_BASE_URL)
 
 export const config = {
   app: {
-    name: env.VITE_APP_NAME ?? 'Crime Intelligence Platform',
+    name: env.VITE_APP_NAME ?? 'Prajna',
     version: env.VITE_APP_VERSION ?? '1.0.0',
     env: env.VITE_APP_ENV ?? 'development',
   },

@@ -60,7 +60,7 @@ export function Sidebar() {
               <Shield className="h-4 w-4 text-white" />
             </div>
             <div>
-              <h1 className="text-sm font-bold">CrimeIntel</h1>
+              <h1 className="text-sm font-bold">Prajna</h1>
               <p className="text-[10px] text-muted-foreground">Command Center</p>
             </div>
           </div>
