@@ -10,7 +10,6 @@ import { Shield, Mail, Lock, Loader2, AlertCircle, UserRound } from 'lucide-reac
 import { Button, Card, CardContent, Input } from '@components/ui'
 import { getSupabase } from '@services/supabase'
 import { useAuthStore } from '@store/index'
-import { config } from '@config/index'
 
 export function LoginPage() {
   const navigate = useNavigate()
