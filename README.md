@@ -9,6 +9,40 @@
 [![ET AI Hackathon 2026](https://img.shields.io/badge/Hackathon-ET%20AI%202026-blue)](#)
 
 ---
+# 🚀 Live Prototype
+
+<p align="center">
+
+<a href="https://prajna-1-0osj.onrender.com">
+  <img src="https://img.shields.io/badge/🌐%20Open%20Live%20Prototype-Visit%20Now-success?style=for-the-badge" />
+</a>
+
+<a href="https://prajna-1-0osj.onrender.com">
+  <img src="https://img.shields.io/badge/👤%20Guest%20Mode-Available-orange?style=for-the-badge" />
+</a>
+
+</p>
+
+> ## ⭐ Experience Prajna without creating an account
+>
+> **Live Demo:**  
+> **https://prajna-1-0osj.onrender.com**
+>
+> **Guest Mode is enabled.**
+> Simply click **"Continue as Guest"** on the login page to explore the complete application in **read-only mode**.
+>
+> This mode is intended for judges, recruiters, and contributors to experience the platform without authentication.
+
+---
+
+## 🔗 Quick Access
+
+| Resource | Link |
+|-----------|------|
+| 🌐 Live Prototype | https://prajna-1-0osj.onrender.com |
+| 📂 GitHub Repository | https://github.com/Balamurali-ai/Prajna |
+
+---
 
 ## Overview
 
